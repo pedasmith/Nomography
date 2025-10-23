@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Nomograph: Convert C to F</title>
+    <script>
+
+        class Axis
+        {
+            constructor (svg, name, x_pixel, ystart_pixel, height_pixel, ymin, ymax, title)
+            {
+
+                this.ymin = ymin;
+                this.ymax = ymax;
+
+                this.svg = svg;
+                this.name = name;
+                this.x_pixel = x_pixel;
+                this.ystart_pixel = ystart_pixel;
+                this.height_pixel = height_pixel;
+                this.title = title;
+
+                this.linestyle = "stroke:black; fill:none;";
+                this.svgns = "http://www.w3.org/2000/svg";
+            }
+
+            YToPixel(y)
+            {
+                let range = this.ymax - this.ymin;
+                let ratio = (y - this.ymin) / range;
+                let retval = ((1.0 - ratio) * this.height_pixel) + this.ystart_pixel;
+                return retval;
+            }
+
+            ElementCreate(svg)
+            {
+                const child = document.createElementNS(this.svgns, "svg");
+                svg.appendChild(child);
+                return child;
+            }
+
+            DrawLinePixel(parent, x1, y1, x2, y2, style)
+            {
+                const line = document.createElementNS(this.svgns, "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y1", y1);
+                line.setAttribute("y2", y2);
+                line.setAttribute("style", style);
+                parent.appendChild(line);
+                return line; // just in case we need to refer to this later.
+            }
+
+            DrawText(parent, str, x, y)
+            {
+                console.log(`DrawText: called:  x=${x}`);
+                let x_pixel = x;
+                let y_pixel = this.YToPixel(y);
+
+                const text = document.createElementNS(this.svgns, "text");
+                text.setAttribute("x", x_pixel+4);
+                // small vertical adjustment so number centers on the tick
+                text.setAttribute("y", y_pixel+4);
+                text.setAttribute("font-size", "12");
+                text.setAttribute("fill", "black");
+                text.textContent = str;
+                this.parent.appendChild(text);
+                return text; // just in case we need it later.
+            }
+            
+            DrawTitlePixel(parent, str, x, y)
+            {
+                const text = document.createElementNS(this.svgns, "text");
+                text.setAttribute("x", x-4);
+                // small vertical adjustment so number centers on the tick
+                text.setAttribute("y", y-4);
+                text.setAttribute("font-size", "16");
+                text.setAttribute("fill", "black");
+                text.textContent = str;
+                this.parent.appendChild(text);
+                return text; // just in case we need it later.
+            }
+
+            DrawGraduations ()
+            {
+                this.parent = this.ElementCreate(this.svg);
+                this.DrawLinePixel(this.parent, this.x_pixel, this.ystart_pixel, this.x_pixel, this.ystart_pixel+this.height_pixel, this.linestyle);
+                this.DrawTitlePixel(this.parent, this.title, this.x_pixel, this.ystart_pixel);
+
+                this.DrawText(this.parent, this.ymin, this.x_pixel, this.ymin);
+                this.DrawText(this.parent, this.ymax, this.x_pixel, this.ymax);
+            }            
+        }
+        /*
+        const linestyle = "stroke:black; fill:none;";
+
+        const svgns = "http://www.w3.org/2000/svg";
+        function ElementCreate(svg, name)
+        {
+            const child = document.createElementNS(svgns, "svg");
+            svg.appendChild(child);
+            return child;
+        }
+
+        function DrawLine(svg, parent, x1, y1, x2, y2, style)
+        {
+            const line = document.createElementNS(svgns, "line");
+            line.setAttribute("x1", x1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y1", y1);
+            line.setAttribute("y2", y2);
+            line.setAttribute("style", style);
+            parent.appendChild(line);
+        }
+
+        function DrawTitle(svg, parent, str, x, y)
+        {
+            const text = document.createElementNS(svgns, "text");
+            text.setAttribute("x", x-4);
+            // small vertical adjustment so number centers on the tick
+            text.setAttribute("y", y-2);
+            text.setAttribute("font-size", "16");
+            text.setAttribute("fill", "black");
+            text.textContent = str;
+            parent.appendChild(text);
+        }
+
+        function DrawTickValue(svg, parent, str, x, y)
+        {
+            const text = document.createElementNS(svgns, "text");
+            text.setAttribute("x", x + 4);
+            // small vertical adjustment so number centers on the tick
+            text.setAttribute("y", y + 4);
+            text.setAttribute("font-size", "10");
+            text.setAttribute("fill", "black");
+            text.textContent = str;
+            parent.appendChild(text);
+        }
+
+        function DrawGraduations (svg, name, x, ystart, height, title, style)
+        {
+            var parent = ElementCreate(svg, name);
+            DrawLine(svg, parent, x, ystart, x, ystart+height, style);
+            DrawTitle(svg, parent, title, x, ystart);
+        }
+
+        function ZZZDrawGraduations(svg, x, ymin, ymax, style)
+        {
+            const parentHeightAttr = svg.getAttribute("height");
+            const parentHeight = parentHeightAttr ? parseFloat(parentHeightAttr) : svg.clientHeight || 400;
+
+            const child = document.createElementNS(svgns, "svg");
+            child.setAttribute("x", x);
+            child.setAttribute("y", 0);
+            child.setAttribute("width", 60); // narrow column for ticks and labels
+            child.setAttribute("height", parentHeight);
+            child.setAttribute("style", "overflow:visible;"); // ensure labels are visible
+            svg.appendChild(child);
+
+
+            const line = document.createElementNS(svgns, "line");
+            line.setAttribute("x1", x);
+            line.setAttribute("x2", x);
+            line.setAttribute("y1", ymin);
+            line.setAttribute("y2", ymax);
+            line.setAttribute("style", style);
+            child.appendChild(line);
+        }
+        */
+
+        function MakePage_30Diagram(svg)
+        {
+            let Width = 80;
+            let HPerUnit = 50;
+
+            let U = new Axis (svg, "U", 20, 50, HPerUnit*4, 0.0, 4.0, "U"); 
+            U.DrawGraduations();
+
+            let V = new Axis (svg, "V", 20+2*Width, 50, HPerUnit*6, 0.0, 6.0, "V"); 
+            V.DrawGraduations();
+
+            let W = new Axis (svg, "W", 20+1*Width, 50, HPerUnit*5, 0.0, 10.0, "W"); 
+            W.DrawGraduations();
+
+        }
+        function OnLoad()
+        {
+            let svg = document.getElementById("nomo");
+            MakePage_30Diagram(svg);
+
+            //let U = new Axis (svg, "U", 20, 50, 200, 0.0, 4.0, "U"); 
+            //U.DrawGraduations();
+            //DrawGraduations(svg, "U", 20, 10, 200, "U", linestyle);
+            //DrawGraduations(svg, "V", 80, 10, 200, "V", linestyle);
+            //DrawGraduations(svg, "W", 50, 10, 200, "W", linestyle);
+        }
+
+    </script>
+</head>
+<body onload="OnLoad()">
+    <h1>Convert C to F (Nomograph)</h1>
+    <svg width="400" height="400" id="nomo">
+        <line x0="10" x1="20" y0="20" y1="20" style="stroke:black; fill:none;" /> 
+    </svg>
+    <form>
+        <input id="idMin" value="3">
+    </form>
+    
+</body>
+</html>
