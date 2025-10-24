@@ -3,6 +3,37 @@
             constructor(alignment)
             {
             }
+
+            TickSize(y, axis)
+            {
+                let tickType = 3;
+                let isInt = Math.round(y) == y;
+                if (y == axis.ymin || y == axis.ymax)
+                {
+                    tickType = 1;
+                }
+                else if (y % 5 == 0)
+                {
+                    tickType = 1;
+                }
+                else if (isInt)
+                {
+                    tickType = 2;
+                }
+                else
+                {
+                    tickType = 3;
+                }
+                let retval = 2;
+                switch (tickType)
+                {
+                    case 1: retval = 8; break;
+                    case 2: retval = 4; break;
+                    case 3: retval = 2; break;
+                    default: retval = 2; break;
+                }
+                return retval;
+            }
             DrawTicks(axis)
             {
                 let tickLeft = 4;
@@ -10,21 +41,8 @@
 
                 for (let y = axis.ymin; y<=axis.ymax; y+=axis.tick_delta)
                 {
-                    if (y == axis.ymin || y == axis.ymax)
-                    {
-                        tickLeft = 6;
-                        tickRight = 6;
-                    }
-                    else if (y % 5 == 0)
-                    {
-                        tickLeft = 4;
-                        tickRight = 4;
-                    }
-                    else
-                    {
-                        tickLeft = 2;
-                        tickRight = 2;
-                    }
+                    tickLeft = this.TickSize(y, axis);
+                    tickRight = tickLeft;
                     axis.DrawLine(axis.parent, axis.x_pixel-tickLeft, y, axis.x_pixel+tickRight, y, axis.linestyle);
                     var str = y.toFixed(axis.tick_precision);
                     // This qualifies as a code issue for RTFM. But it's quick and it works for now.
@@ -174,7 +192,7 @@
                 this.HTitle_pixel = 20;
                 this.HFooter_pixel = 20;
 
-                this.AxisW_pixel = 80;
+                this.AxisW_pixel = 120;
 
                 this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(svg)
 
