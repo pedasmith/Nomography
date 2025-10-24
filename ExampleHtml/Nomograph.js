@@ -4,11 +4,11 @@
             {
             }
 
-            TickSize(y, axis)
+            TickSize(y, scale)
             {
                 let tickType = 3;
                 let isInt = Math.round(y) == y;
-                if (y == axis.ymin || y == axis.ymax)
+                if (y == scale.ymin || y == scale.ymax)
                 {
                     tickType = 1;
                 }
@@ -28,33 +28,33 @@
                 switch (tickType)
                 {
                     case 1: retval = 8; break;
-                    case 2: retval = 4; break;
-                    case 3: retval = 2; break;
+                    case 2: retval = 6; break;
+                    case 3: retval = 4; break;
                     default: retval = 2; break;
                 }
                 return retval;
             }
-            DrawTicks(axis)
+            DrawTicks(scale)
             {
                 let tickLeft = 4;
                 let tickRight = 4;
 
-                for (let y = axis.ymin; y<=axis.ymax; y+=axis.tick_delta)
+                for (let y = scale.ymin; y<=scale.ymax; y+=scale.tick_delta)
                 {
-                    tickLeft = this.TickSize(y, axis);
+                    tickLeft = this.TickSize(y, scale);
                     tickRight = tickLeft;
-                    axis.DrawLine(axis.parent, axis.x_pixel-tickLeft, y, axis.x_pixel+tickRight, y, axis.linestyle);
-                    var str = y.toFixed(axis.tick_precision);
-                    // This qualifies as a code issue for RTFM. But it's quick and it works for now.
+                    scale.DrawLine(scale.parent, scale.x_pixel-tickLeft, y, scale.x_pixel+tickRight, y, scale.linestyle);
+                    var str = y.toFixed(scale.tick_precision);
+                    // This qualifies as a code issue for Daily WTF. But it's quick and it works for now.
                     str = str.replace(".0000", "     ");
                     str = str.replace(".000", "    ");
                     str = str.replace(".00", "   ");
                     str = str.replace(".0", "  ");
-                    axis.DrawText(axis.parent, str, axis.alignment, axis.x_pixel+2, y, axis.tick_textstyle);
+                    scale.DrawText(scale.parent, str, scale.alignment, scale.x_pixel+2, y, scale.tick_textstyle);
                 }
             }
         }
-        class Axis
+        class Scale
         {
             constructor (svg, name, x_pixel, ystart_pixel, height_pixel, ymin, ymax, title, alignment)
             {
@@ -68,14 +68,15 @@
                 this.svg = svg;
                 this.name = name;
                 this.x_pixel = x_pixel;
-                this.ystart_pixel = ystart_pixel;
+                this.ystart_pixel = ystart_pixel; // this is at the top (e.g., y pixel pos of ymax)
                 this.height_pixel = height_pixel;
+                this.ybottom_pixel = this.ystart_pixel + this.height_pixel;
                 this.title = title;
 
                 this.alignment = alignment;
                 if (alignment != "left" && alignment != "right")
                 {
-                    console.log(`Error: Axis:Ticks: alignment is ${alignment}. It must be left or right.`);
+                    console.log(`Error: Scale:Ticks: alignment is ${alignment}. It must be left or right.`);
                 }
 
                 this.tick_textstyle = "font-family:Courier New, monospace;white-space: pre;";
@@ -94,11 +95,35 @@
                 return retval;
             }
 
+            PixelToY(ypixel)
+            {
+                if (ypixel < this.ystart_pixel) return this.ymax;
+                if (ypixel > this.ystart_pixel + this.height_pixel) return this.ymin;
+
+                let range = this.height_pixel;
+                let ratio = (ypixel - this.ystart_pixel) / range;
+                let retval = ((1.0 - ratio) * (this.ymax-this.ymin)) + this.ymin;
+                return retval;
+            }
+
             ElementCreate(svg)
             {
                 const child = document.createElementNS(this.svgns, "svg");
                 svg.appendChild(child);
                 return child;
+            }
+
+            /// NOTE: this method might be part of an Scale, but it's "static" and can
+            /// be called from anywhere.
+            DrawCirclePixel(parent, cx_pixel, cy_pixel, radius_pixel, style)
+            {
+                const circle = document.createElementNS(this.svgns, "circle");
+                circle.setAttribute("cx", cx_pixel);
+                circle.setAttribute("cy", cy_pixel);
+                circle.setAttribute("r", radius_pixel);
+                circle.setAttribute("style", style);
+                parent.appendChild(circle);
+                return circle; // just in case we need to refer to this later.
             }
             DrawLine(parent, x1_pixel, y1, x2_pixel, y2, style)
             {
@@ -113,6 +138,9 @@
                 parent.appendChild(line);
                 return line; // just in case we need to refer to this later.
             }
+
+            /// NOTE: this method might be part of an Scale, but it's "static" and can
+            /// be called from anywhere.
             DrawLinePixel(parent, x1_pixel, y1_pixel, x2_pixel, y2_pixel, style)
             {
                 const line = document.createElementNS(this.svgns, "line");
@@ -127,7 +155,7 @@
 
             DrawText(parent, str, alignment, x, y, style)
             {
-                console.log(`DrawText: called: str=<<${str}>> alignment=${alignment} x=${x}`);
+                //console.log(`DrawText: called: str=<<${str}>> alignment=${alignment} x=${x}`);
                 let x_pixel = x;
                 let y_pixel = this.YToPixel(y);
 
@@ -192,7 +220,7 @@
                 this.HTitle_pixel = 20;
                 this.HFooter_pixel = 20;
 
-                this.AxisW_pixel = 120;
+                this.ScaleW_pixel = 120;
 
                 this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(svg)
 
@@ -213,58 +241,118 @@
                 let height= this.svg.getBoundingClientRect().height;
 
                 this.XU_pixel = 40;
-                this.XW_pixel = this.XU_pixel + this.AxisW_pixel;
-                this.XV_pixel = this.XU_pixel + 2*this.AxisW_pixel;
+                this.XW_pixel = this.XU_pixel + this.ScaleW_pixel;
+                this.XV_pixel = this.XU_pixel + 2*this.ScaleW_pixel;
 
                 let h_pixel = height - this.HTitle_pixel - this.HFooter_pixel;
                 let h_per_unit_u = h_pixel / (this.umax - this.umin); 
                 let h_per_unit_v = h_pixel / (this.vmax - this.vmin);
                 let h_per_unit = h_per_unit_u < h_per_unit_v ? h_per_unit_u : h_per_unit_v; 
 
-                this.U = new Axis (this.svg, "U", 
+                this.U = new Scale (this.svg, "U", 
                     this.XU_pixel, 
                     this.HTitle_pixel, h_per_unit*(this.umax-this.umin), 
                     this.umin, this.umax, 
                     "U", "left"); 
                 this.U.DrawGraduations();
 
-                this.V = new Axis (this.svg, "V", 
+                this.V = new Scale (this.svg, "V", 
                     this.XV_pixel, 
                     this.HTitle_pixel, h_per_unit*(this.vmax-this.vmin), 
                     this.vmin, this.vmax, 
                     "V", "right"); 
                 this.V.DrawGraduations();
 
-                this.W = new Axis (this.svg, "W", 
+                this.W = new Scale (this.svg, "W", 
                     this.XW_pixel, 
                     this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) / 2, 
                     this.wmin, this.wmax, 
                     "W", "right"); 
-               this.W.DrawGraduations();
-            }
+                this.W.DrawGraduations();
 
+                this.cursor_style = "stroke:blue; fill:none; stroke-width:4px"; 
+                this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";
+                this.cursorMarkerRadius = 10;
+                this.cursorMarkerSelectedRadius = 15;
 
-            ZZZMakePage_30Diagram(svg)
-            {
-                var nomograph = new NomographTypeI(svg);
-                let Width = 80;
-                let HPerUnit = 50;
+                this.cursor = this.U.DrawLinePixel(this.svg, 
+                    this.U.x_pixel, this.U.ybottom_pixel, 
+                    this.V.x_pixel, this.V.ybottom_pixel, this.cursor_style);
+                this.cursorMarkerLeft = this.U.DrawCirclePixel(this.svg, this.U.x_pixel, this.U.ybottom_pixel, 
+                    this.cursorMarkerRadius, this.cursorMarker_style);                
+                this.cursorMarkerRight = this.U.DrawCirclePixel(this.svg, this.V.x_pixel, this.V.ybottom_pixel, 
+                    this.cursorMarkerRadius, this.cursorMarker_style);
+/*
+                this.cursorMarkerLeft.addEventListener("mouseover", (evt) => {
+                    var circle = evt.currentTarget;
+                    circle.setAttribute("r", this.cursorMarkerSelectedRadius);
+                });
+                this.cursorMarkerLeft.addEventListener("mouseout", (evt) => {
+                    var circle = evt.currentTarget;
+                    circle.setAttribute("r", this.cursorMarkerRadius);
+                });
+                */
 
-                let U = new Axis (svg, "U", 20, 50, HPerUnit*4, 0.0, 4.0, "U", "left"); 
-                U.DrawGraduations();
+                this.trackingMarker = null;
+                this.trackingScale = null;
+                this.trackingY = "y1";
+                this.trackingArrowFunction = (evt) => 
+                    { 
+                        if (this.trackingMarker != null && this.trackingScale != null)
+                        {
+                            // Move the marker + cursor!
+                            let rect = this.svg.getBoundingClientRect();
+                            let ypixel = evt.y - rect.top;
+                            let y = this.trackingScale.PixelToY(ypixel);
+                            console.log(`DBG: tracking ypixel=${ypixel} y=${y}`);
 
-                let V = new Axis (svg, "V", 20+2*Width, 50, HPerUnit*6, 0.0, 6.0, "V", "right"); 
-                V.DrawGraduations();
+                            this.cursor.setAttribute(this.trackingY, ypixel);
+                            this.trackingMarker.setAttribute("cy", ypixel);
+                        }
+                    };
+                this.mouseUpArrowFunction = (evt) => 
+                    { 
+                        console.log(`DBG: UP x=${evt.x}`)
 
-                let W = new Axis (svg, "W", 20+1*Width, 50, HPerUnit*5, 0.0, 10.0, "W", "right"); 
-                W.DrawGraduations();
+                        evt.preventDefault();
+                        this.trackingMarker.setAttribute("r", this.cursorMarkerRadius);
+                        this.svg.removeEventListener("mousemove", this.trackingArrowFunction);
+                        this.svg.removeEventListener("mouseup", this.mouseUpArrowFunction);
+                        this.trackingMarker = null;
+                        this.trackingScale = null;
+                    };
+
+                this.cursorMarkerLeft.addEventListener("mousedown", (evt) => {
+                    this.trackingScale = this.U;
+                    this.trackingY = "y1";
+
+                    evt.preventDefault();
+                    this.trackingMarker = evt.currentTarget;
+                    this.trackingMarker.setAttribute("r", this.cursorMarkerSelectedRadius);
+                    this.svg.addEventListener("mousemove", this.trackingArrowFunction);
+                    this.svg.addEventListener("mouseup", this.mouseUpArrowFunction);
+                    console.log(`DBG: mousedown on ${this.trackingMarker}`)
+                });
+
+                // Same as the Left but binds to the V Scale not the U one
+                this.cursorMarkerRight.addEventListener("mousedown", (evt) => {
+                    this.trackingScale = this.V;
+                    this.trackingY = "y2";
+
+                    evt.preventDefault();
+                    this.trackingMarker = evt.currentTarget;
+                    this.trackingMarker.setAttribute("r", this.cursorMarkerSelectedRadius);
+                    this.svg.addEventListener("mousemove", this.trackingArrowFunction);
+                    this.svg.addEventListener("mouseup", this.mouseUpArrowFunction);
+                    console.log(`DBG: mousedown on ${this.trackingMarker}`)
+                });
             }
 
         }
 
         function MakePage_30Diagram(svg)
         {
-            var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0);
+            var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0); // U scale is 0..4 V scale is 0..6
             nomograph.Initialize();
             return nomograph;
         }
