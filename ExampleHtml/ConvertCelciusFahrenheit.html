@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Nomograph: Convert C to F</title>
-    <script src="Nomograph.js">
-
-    </script>
+    <link rel="stylesheet" href="nomograph.css">
+    <script src="Nomograph.js" ></script>
 </head>
 <body onload="OnLoad()">
-    <h1>Convert C to F (Nomograph)</h1>
-    <svg width="400" height="500" id="nomo">
-    </svg>
-    <form>
-        <input id="idMin" value="5">
-    </form>
-    
+    <div class="box">
+        <header class="row header">
+            <h1>Convert C to F (Nomograph)</h1>
+        </header>
+        <div class="row content">
+            <svg height="100%" width="400" id="nomo" />
+        </div>
+        <div class="row footer">
+            <form>
+                <input id="idMin" value="5">
+            </form>
+        </div>
+    </div>
 </body>
 </html>

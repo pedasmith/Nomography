@@ -8,7 +8,7 @@
                 let tickLeft = 4;
                 let tickRight = 4;
 
-                for (let y = axis.ymin; y<=axis.ymax; y++)
+                for (let y = axis.ymin; y<=axis.ymax; y+=axis.tick_delta)
                 {
                     if (y == axis.ymin || y == axis.ymax)
                     {
@@ -26,7 +26,13 @@
                         tickRight = 2;
                     }
                     axis.DrawLine(axis.parent, axis.x_pixel-tickLeft, y, axis.x_pixel+tickRight, y, axis.linestyle);
-                    axis.DrawText(axis.parent, y, axis.alignment, axis.x_pixel+2, y);
+                    var str = y.toFixed(axis.tick_precision);
+                    // This qualifies as a code issue for RTFM. But it's quick and it works for now.
+                    str = str.replace(".0000", "     ");
+                    str = str.replace(".000", "    ");
+                    str = str.replace(".00", "   ");
+                    str = str.replace(".0", "  ");
+                    axis.DrawText(axis.parent, str, axis.alignment, axis.x_pixel+2, y, axis.tick_textstyle);
                 }
             }
         }
@@ -34,6 +40,10 @@
         {
             constructor (svg, name, x_pixel, ystart_pixel, height_pixel, ymin, ymax, title, alignment)
             {
+                this.tick_start = ymin;
+                this.tick_delta = 0.5;
+                this.tick_precision = 1;
+
                 this.ymin = ymin;
                 this.ymax = ymax;
 
@@ -50,6 +60,7 @@
                     console.log(`Error: Axis:Ticks: alignment is ${alignment}. It must be left or right.`);
                 }
 
+                this.tick_textstyle = "font-family:Courier New, monospace;white-space: pre;";
                 this.linestyle = "stroke:black; fill:none;";
                 this.svgns = "http://www.w3.org/2000/svg";
 
@@ -96,9 +107,9 @@
                 return line; // just in case we need to refer to this later.
             }
 
-            DrawText(parent, str, alignment, x, y)
+            DrawText(parent, str, alignment, x, y, style)
             {
-                //console.log(`DrawText: called: str=${str} alignment=${alignment} x=${x}`);
+                console.log(`DrawText: called: str=<<${str}>> alignment=${alignment} x=${x}`);
                 let x_pixel = x;
                 let y_pixel = this.YToPixel(y);
 
@@ -117,6 +128,10 @@
                 text.setAttribute("y", y_pixel+4);
                 text.setAttribute("font-size", "12");
                 text.setAttribute("fill", "black");
+                if (style != undefined)
+                {
+                    text.setAttribute("style", style);
+                }
                 text.textContent = str;
                 this.parent.appendChild(text);
                 return text; // just in case we need it later.
@@ -161,15 +176,25 @@
 
                 this.AxisW_pixel = 80;
 
+                this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(svg)
+
+            }
+
+            OnSizeChange()
+            {
+                let height= this.svg.getBoundingClientRect().height;
+                this.svg.innerHTML = "";
+                this.Initialize();
             }
 
             Initialize()
             {
                 //let bbox = this.svg.getBBox(); // Nope; this is the height after all the objects are placed
-                let height= this.svg.getAttribute("height");
-                console.log(`DBG: Initialize: height=${height} `);
+                //let height= this.svg.getAttribute("height");
+                //let height= this.svg.offsetHeight;
+                let height= this.svg.getBoundingClientRect().height;
 
-                this.XU_pixel = 20;
+                this.XU_pixel = 40;
                 this.XW_pixel = this.XU_pixel + this.AxisW_pixel;
                 this.XV_pixel = this.XU_pixel + 2*this.AxisW_pixel;
 
