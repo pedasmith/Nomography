@@ -17,10 +17,13 @@
         function OnBodyLoad()
         {
             const s = document.getElementById("uiExample");
+            var lastkey = "";
             for (const [key, value] of Object.entries(Examples)) {
                 const option = new Option(value.Short, key);
+                lastkey = key;
                 s.add(option);
             }
+            s.value = lastkey;
             s.dispatchEvent(new Event("change"));
         }        
     </script>

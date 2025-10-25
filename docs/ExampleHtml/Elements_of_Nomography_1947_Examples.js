@@ -23,6 +23,20 @@ const Examples = {
         "Title": "Page 32 example nomograph (bottom)",
         "Details": "Demonstrates that the scales don't need to even include the 0 point. Note that the W scale lables are on the left, not the right.",
         "Create": MakePage_32BottomDiagram
+    },
+
+    "page 34": {
+        "Short": "Page 34",
+        "Title": "Page 34 example nomograph",
+        "Details": "This nomograph is used as part of a problem set. It doesn't have any additional features that the earlier nomographs don't have",
+        "Create": MakePage_34Diagram
+    },
+
+    "page 36": {
+        "Short": "Page 36",
+        "Title": "Page 36 example nomograph",
+        "Details": "This nomograph is used as part of a problem set. It doesn't have any additional features that the earlier nomographs don't have",
+        "Create": MakePage_36Diagram
     }
 }
 
@@ -52,6 +66,39 @@ function MakePage_32BottomDiagram(svg)
     nomograph.U_tick_delta = 0.25;
     nomograph.V_tick_delta = 0.25;
     nomograph.W_tick_delta = 0.50;
+    nomograph.W_tick_label_alignment ="left";
+    nomograph.Initialize();
+    return nomograph;
+}
+
+function MakePage_34Diagram(svg)
+{
+    var nomograph = new NomographTypeI(svg, 0.0, 12.0, 0.0, 12.0); 
+    nomograph.U_tick_delta = 0.5;
+    nomograph.V_tick_delta = 0.5;
+    nomograph.W_tick_delta = 1.;
+    nomograph.U_tick_label_delta = 2.0;
+    nomograph.V_tick_label_delta = 2.0;
+    nomograph.W_tick_label_delta = 2.0;
+    nomograph.W_tick_label_alignment ="left";
+    nomograph.Initialize();
+    return nomograph;
+}
+
+function MakePage_36Diagram(svg)
+{
+    var nomograph = new NomographTypeI(svg, -27.0, 9.0, 18.0, 54.0); 
+    nomograph.U_tick_delta = 1.0;
+    nomograph.V_tick_delta = 1.0;
+    nomograph.W_tick_delta = 2.0;
+    nomograph.W_tick_first = -8.0; // otherwise the ticks are offset from the labels
+    nomograph.U_tick_label_delta = 10.0;
+    nomograph.V_tick_label_delta = 10.0;
+    nomograph.W_tick_label_delta = 10.0;
+
+    nomograph.U_tick_label_first = -20.0;
+    nomograph.V_tick_label_first = 20.0;
+    nomograph.W_tick_label_first = 0.0;
     nomograph.W_tick_label_alignment ="left";
     nomograph.Initialize();
     return nomograph;

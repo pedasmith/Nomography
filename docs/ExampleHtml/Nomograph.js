@@ -44,14 +44,14 @@
                 let tickLeft = 4;
                 let tickRight = 4;
 
-                for (let y = scale.ymin; y<=scale.ymax; y+=scale.tick_delta)
+                for (let y = scale.tick_first; y<=scale.ymax; y+=scale.tick_delta)
                 {
                     tickLeft = this.TickSize(y, scale);
                     tickRight = tickLeft;
                     scale.DrawLine(scale.parent, scale.x_pixel-tickLeft, y, scale.x_pixel+tickRight, y, scale.linestyle);
                 }
 
-                for (let y = scale.tick_first_label; y<=scale.ymax; y+=scale.tick_label_delta)
+                for (let y = scale.tick_label_first; y<=scale.ymax; y+=scale.tick_label_delta)
                 {
                     var str = y.toFixed(scale.tick_precision);
                     // This qualifies as a code issue for Daily WTF. But it's quick and it works for now.
@@ -72,10 +72,10 @@
         {
             constructor (svg, name, x_pixel, ystart_pixel, height_pixel, ymin, ymax, title, tick_label_alignment)
             {
-                this.tick_start = ymin;
+                this.tick_first = ymin;
                 this.tick_delta = 0.5;
                 this.tick_precision = 1;
-                this.tick_first_label = ymin;
+                this.tick_label_first = ymin;
                 this.tick_label_delta = 1.0;
 
                 this.ymin = ymin;
@@ -284,8 +284,10 @@
                     this.umin, this.umax, 
                     "U", "left"); 
                 if ("U_tick_delta" in this) this.U.tick_delta = this.U_tick_delta;
+                if ("U_tick_first" in this) this.U.tick_first = this.U_tick_first;
                 if ("U_tick_label_delta" in this) this.U.tick_label_delta = this.U_tick_label_delta;
                 if ("U_tick_label_alignment" in this) this.U.tick_label_alignment = this.U_tick_label_alignment;
+                if ("U_tick_label_first" in this) this.U.tick_label_first = this.U_tick_label_first;
 
                 this.V = new Scale (this.svg, "V", 
                     this.XV_pixel, 
@@ -293,8 +295,10 @@
                     this.vmin, this.vmax, 
                     "V", "right"); 
                 if ("V_tick_delta" in this) this.V.tick_delta = this.V_tick_delta;
+                if ("V_tick_first" in this) this.V.tick_first = this.V_tick_first;
                 if ("V_tick_label_delta" in this) this.V.tick_label_delta = this.V_tick_label_delta;
                 if ("V_tick_label_alignment" in this) this.V.tick_label_alignment = this.V_tick_label_alignment;
+                if ("V_tick_label_first" in this) this.V.tick_label_first = this.V_tick_label_first;
 
                 this.W = new Scale (this.svg, "W", 
                     this.XW_pixel, 
@@ -302,8 +306,10 @@
                     this.wmin, this.wmax, 
                     "W", "right"); 
                 if ("W_tick_delta" in this) this.W.tick_delta = this.W_tick_delta;
+                if ("W_tick_first" in this) this.W.tick_first = this.W_tick_first;
                 if ("W_tick_label_delta" in this) this.W.tick_label_delta = this.W_tick_label_delta;
                 if ("W_tick_label_alignment" in this) this.W.tick_label_alignment = this.W_tick_label_alignment;
+                if ("W_tick_label_first" in this) this.W.tick_label_first = this.W_tick_label_first;
 
                 this.cursor_style = "stroke:blue; fill:none; stroke-width:4px"; 
                 this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";
