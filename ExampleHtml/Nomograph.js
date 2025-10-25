@@ -44,6 +44,10 @@
                     tickLeft = this.TickSize(y, scale);
                     tickRight = tickLeft;
                     scale.DrawLine(scale.parent, scale.x_pixel-tickLeft, y, scale.x_pixel+tickRight, y, scale.linestyle);
+                }
+
+                for (let y = scale.tick_first_label; y<=scale.ymax; y+=scale.tick_label_delta)
+                {
                     var str = y.toFixed(scale.tick_precision);
                     // This qualifies as a code issue for Daily WTF. But it's quick and it works for now.
                     str = str.replace(".0000", "     ");
@@ -52,6 +56,7 @@
                     str = str.replace(".0", "  ");
                     scale.DrawText(scale.parent, str, scale.alignment, scale.x_pixel+2, y, scale.tick_textstyle);
                 }
+
             }
         }
         class Scale
@@ -61,6 +66,8 @@
                 this.tick_start = ymin;
                 this.tick_delta = 0.5;
                 this.tick_precision = 1;
+                this.tick_first_label = ymin;
+                this.tick_label_delta = 1.0;
 
                 this.ymin = ymin;
                 this.ymax = ymax;
@@ -233,6 +240,7 @@
                 this.Initialize();
             }
 
+
             Initialize()
             {
                 //let bbox = this.svg.getBBox(); // Nope; this is the height after all the objects are placed
@@ -254,27 +262,31 @@
                     this.HTitle_pixel, h_per_unit*(this.umax-this.umin), 
                     this.umin, this.umax, 
                     "U", "left"); 
-                this.U.DrawGraduations();
+                if ("U_tick_delta" in this) this.U.tick_delta = this.U_tick_delta;
+                if ("U_tick_label_delta" in this) this.U.tick_label_delta = this.U_tick_label_delta;
 
                 this.V = new Scale (this.svg, "V", 
                     this.XV_pixel, 
                     this.HTitle_pixel, h_per_unit*(this.vmax-this.vmin), 
                     this.vmin, this.vmax, 
                     "V", "right"); 
-                this.V.DrawGraduations();
+                if ("V_tick_delta" in this) this.V.tick_delta = this.V_tick_delta;
+                if ("V_tick_label_delta" in this) this.V.tick_label_delta = this.V_tick_label_delta;
 
                 this.W = new Scale (this.svg, "W", 
                     this.XW_pixel, 
                     this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) / 2, 
                     this.wmin, this.wmax, 
                     "W", "right"); 
-                this.W.DrawGraduations();
+                if ("W_tick_delta" in this) this.W.tick_delta = this.W_tick_delta;
+                if ("W_tick_label_delta" in this) this.W.tick_label_delta = this.W_tick_label_delta;
 
                 this.cursor_style = "stroke:blue; fill:none; stroke-width:4px"; 
                 this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";
                 this.cursorMarkerRadius = 10;
                 this.cursorMarkerSelectedRadius = 15;
 
+                // All the cursor stuff!
                 this.cursor = this.U.DrawLinePixel(this.svg, 
                     this.U.x_pixel, this.U.ybottom_pixel, 
                     this.V.x_pixel, this.V.ybottom_pixel, this.cursor_style);
@@ -282,16 +294,6 @@
                     this.cursorMarkerRadius, this.cursorMarker_style);                
                 this.cursorMarkerRight = this.U.DrawCirclePixel(this.svg, this.V.x_pixel, this.V.ybottom_pixel, 
                     this.cursorMarkerRadius, this.cursorMarker_style);
-/*
-                this.cursorMarkerLeft.addEventListener("mouseover", (evt) => {
-                    var circle = evt.currentTarget;
-                    circle.setAttribute("r", this.cursorMarkerSelectedRadius);
-                });
-                this.cursorMarkerLeft.addEventListener("mouseout", (evt) => {
-                    var circle = evt.currentTarget;
-                    circle.setAttribute("r", this.cursorMarkerRadius);
-                });
-                */
 
                 this.trackingMarker = null;
                 this.trackingScale = null;
@@ -304,7 +306,7 @@
                             let rect = this.svg.getBoundingClientRect();
                             let ypixel = evt.y - rect.top;
                             let y = this.trackingScale.PixelToY(ypixel);
-                            console.log(`DBG: tracking ypixel=${ypixel} y=${y}`);
+                            //console.log(`MOUSE: tracking ypixel=${ypixel} y=${y}`);
 
                             this.cursor.setAttribute(this.trackingY, ypixel);
                             this.trackingMarker.setAttribute("cy", ypixel);
@@ -312,7 +314,7 @@
                     };
                 this.mouseUpArrowFunction = (evt) => 
                     { 
-                        console.log(`DBG: UP x=${evt.x}`)
+                        // console.log(`MOUSE: UP x=${evt.x}`)
 
                         evt.preventDefault();
                         this.trackingMarker.setAttribute("r", this.cursorMarkerRadius);
@@ -331,7 +333,7 @@
                     this.trackingMarker.setAttribute("r", this.cursorMarkerSelectedRadius);
                     this.svg.addEventListener("mousemove", this.trackingArrowFunction);
                     this.svg.addEventListener("mouseup", this.mouseUpArrowFunction);
-                    console.log(`DBG: mousedown on ${this.trackingMarker}`)
+                    //console.log(`MOUSE: mousedown on ${this.trackingMarker}`)
                 });
 
                 // Same as the Left but binds to the V Scale not the U one
@@ -344,8 +346,13 @@
                     this.trackingMarker.setAttribute("r", this.cursorMarkerSelectedRadius);
                     this.svg.addEventListener("mousemove", this.trackingArrowFunction);
                     this.svg.addEventListener("mouseup", this.mouseUpArrowFunction);
-                    console.log(`DBG: mousedown on ${this.trackingMarker}`)
+                    //console.log(`MOUSE: mousedown on ${this.trackingMarker}`)
                 });
+
+                // At the very end, draw the nomograph
+                this.U.DrawGraduations();
+                this.V.DrawGraduations();
+                this.W.DrawGraduations();
             }
 
         }
@@ -353,6 +360,18 @@
         function MakePage_30Diagram(svg)
         {
             var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0); // U scale is 0..4 V scale is 0..6
+            nomograph.W_tick_delta = 1.0;
+            nomograph.W_tick_label_delta = 2;
+            nomograph.Initialize();
+            return nomograph;
+        }
+
+        function MakePage_32Diagram(svg)
+        {
+            var nomograph = new NomographTypeI(svg, -3.0, 0.5, -2.0, 1.5); // U scale is -3..0.5 V scale is -2..0.5
+            nomograph.U_tick_delta = 0.25;
+            nomograph.V_tick_delta = 0.25;
+            nomograph.W_tick_delta = 0.50;
             nomograph.Initialize();
             return nomograph;
         }
@@ -360,6 +379,6 @@
         function OnLoad()
         {
             let svg = document.getElementById("nomo");
-            MakePage_30Diagram(svg);
+            MakePage_32Diagram(svg);
         }
 

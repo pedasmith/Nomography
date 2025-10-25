@@ -4,10 +4,12 @@ Contains exploratory code for making a variety of Nomographs. Examples are from 
 
 ## Simpke TODO items
 
-Resize. On size changes, redraw.
+
+DONE: 2025-10-24: Can move the cursor around.
+DONE: 2025-10-24: Resize. On size changes, redraw.
 DONE: 2025-10-23: Auto-size. Graph should have space for title + footer, and the rest of the SVG should be for the diagram
 
-## Can the exported SVG be used for laser engraving?\
+## Can the exported SVG be used for laser engraving?
 
 Maybe? Can I import the SVG into Inkscape and then exort EPS?
 
