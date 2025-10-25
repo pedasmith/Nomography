@@ -81,6 +81,8 @@
                 this.ymin = ymin;
                 this.ymax = ymax;
 
+                this.direction = "up"; // either "up" or "down". Default is down.
+
                 this.svg = svg;
                 this.name = name;
                 this.x_pixel = x_pixel;
@@ -109,6 +111,7 @@
             {
                 let range = this.ymax - this.ymin;
                 let ratio = (y - this.ymin) / range;
+                if (this.direction == "down") ratio = 1.0 - ratio;
                 let retval = ((1.0 - ratio) * this.height_pixel) + this.ystart_pixel;
                 return retval;
             }
@@ -122,6 +125,7 @@
 
                 let range = this.height_pixel;
                 let ratio = (ypixel - this.ystart_pixel) / range;
+                if (this.direction == "down") ratio = 1.0 - ratio;
                 let retval = ((1.0 - ratio) * (this.ymax-this.ymin)) + this.ymin;
                 return retval;
             }
@@ -272,6 +276,24 @@
                 this.XU_pixel = 40;
                 this.XW_pixel = this.XU_pixel + this.ScaleW_pixel;
                 this.XV_pixel = this.XU_pixel + 2*this.ScaleW_pixel;
+                this.XRight_pixel = this.XV_pixel;
+
+                let v_scale = 1.0;
+                let w_scale = 2.0;
+
+                if (this.order == "UVW")
+                {
+                    const temp = this.XW_pixel;
+                    this.XW_pixel = this.XV_pixel;
+                    this.XV_pixel = temp;
+                    this.XRight_pixel = this.XW_pixel;
+
+                    this.V_direction = "down";
+                    this.W_direction = "down";
+
+                    v_scale = 2.0;
+                    w_scale = 1.0;
+                }
 
                 let h_pixel = height - this.HTitle_pixel - this.HFooter_pixel;
                 let h_per_unit_u = h_pixel / (this.umax - this.umin); 
@@ -283,6 +305,7 @@
                     this.HTitle_pixel, h_per_unit*(this.umax-this.umin), 
                     this.umin, this.umax, 
                     "U", "left"); 
+                if ("U_direction" in this) this.U.direction = this.U_direction;
                 if ("U_tick_delta" in this) this.U.tick_delta = this.U_tick_delta;
                 if ("U_tick_first" in this) this.U.tick_first = this.U_tick_first;
                 if ("U_tick_label_delta" in this) this.U.tick_label_delta = this.U_tick_label_delta;
@@ -291,9 +314,10 @@
 
                 this.V = new Scale (this.svg, "V", 
                     this.XV_pixel, 
-                    this.HTitle_pixel, h_per_unit*(this.vmax-this.vmin), 
+                    this.HTitle_pixel, h_per_unit*(this.vmax-this.vmin)  / v_scale, 
                     this.vmin, this.vmax, 
                     "V", "right"); 
+                if ("V_direction" in this) this.V.direction = this.V_direction;
                 if ("V_tick_delta" in this) this.V.tick_delta = this.V_tick_delta;
                 if ("V_tick_first" in this) this.V.tick_first = this.V_tick_first;
                 if ("V_tick_label_delta" in this) this.V.tick_label_delta = this.V_tick_label_delta;
@@ -302,9 +326,10 @@
 
                 this.W = new Scale (this.svg, "W", 
                     this.XW_pixel, 
-                    this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) / 2, 
+                    this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) / w_scale, 
                     this.wmin, this.wmax, 
                     "W", "right"); 
+                if ("W_direction" in this) this.W.direction = this.W_direction;
                 if ("W_tick_delta" in this) this.W.tick_delta = this.W_tick_delta;
                 if ("W_tick_first" in this) this.W.tick_first = this.W_tick_first;
                 if ("W_tick_label_delta" in this) this.W.tick_label_delta = this.W_tick_label_delta;
@@ -317,12 +342,14 @@
                 this.cursorMarkerSelectedRadius = 15;
 
                 // All the cursor stuff!
+                let scaleRight = this.V;
+                if (this.order == "UVW") scaleRight =this.W;
                 this.cursor = this.U.DrawLinePixel(this.svg, 
                     this.U.x_pixel, this.U.ybottom_pixel, 
-                    this.V.x_pixel, this.V.ybottom_pixel, this.cursor_style);
+                    scaleRight.x_pixel, scaleRight.ybottom_pixel, this.cursor_style);
                 this.cursorMarkerLeft = this.U.DrawCirclePixel(this.svg, this.U.x_pixel, this.U.ybottom_pixel, 
                     this.cursorMarkerRadius, this.cursorMarker_style);                
-                this.cursorMarkerRight = this.U.DrawCirclePixel(this.svg, this.V.x_pixel, this.V.ybottom_pixel, 
+                this.cursorMarkerRight = this.U.DrawCirclePixel(this.svg, scaleRight.x_pixel, scaleRight.ybottom_pixel, 
                     this.cursorMarkerRadius, this.cursorMarker_style);
 
                 this.trackingMarker = null;

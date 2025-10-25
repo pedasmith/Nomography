@@ -4,6 +4,8 @@ Contains exploratory code for making a variety of Nomographs. Examples are from 
 
 ## Simple TODO items
 
+DONE: 2025-10-25: Allow for graphs with ordering UVW. In this scheme, the V scale is in the middle, is 2x the U scale, and both the V and W scale are flipped top to bottom.
+
 DONE: 2025-10-25: Setup to make this available on Github Pages. Clean up code and make diagraph 32 bottom.
 DONE: 2025-10-25: Allow user to pick from a set of options. The set is easy to update.
 DONE: 2025-10-24: Can move the cursor around.

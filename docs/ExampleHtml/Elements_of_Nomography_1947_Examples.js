@@ -37,6 +37,13 @@ const Examples = {
         "Title": "Page 36 example nomograph",
         "Details": "This nomograph is used as part of a problem set. It doesn't have any additional features that the earlier nomographs don't have",
         "Create": MakePage_36Diagram
+    },
+
+    "page 38": {
+        "Short": "Page 38",
+        "Title": "Page 38 example nomograph",
+        "Details": "Radical change: with UVW scales, the V scale is in the middle. For this to work, the V and W scales are inverted, the V scaling is like the classic W scaling and the W scaling is like the classes V scaling.",
+        "Create": MakePage_38Diagram
     }
 }
 
@@ -103,3 +110,21 @@ function MakePage_36Diagram(svg)
     nomograph.Initialize();
     return nomograph;
 }
+
+function MakePage_38Diagram(svg)
+{
+    var nomograph = new NomographTypeI(svg, -2.0, 2.0, -4.0, 4.0); 
+    nomograph.order = "UVW"; // allowed: UWV default or UVW
+    nomograph.wmin = -2;
+    nomograph.wmax = 2;
+    // UVW also sets the direction of V and W to "down"
+    // and sets their scale correctly.
+
+    nomograph.V_tick_label_alignment = "left";
+    nomograph.Initialize();
+    return nomograph;
+}
+
+
+
+
