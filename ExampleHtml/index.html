@@ -16,13 +16,10 @@
         }
         function OnBodyLoad()
         {
-            //let svg = document.getElementById("nomo");
-            //MakePage_32Diagram(svg);
             const s = document.getElementById("uiExample");
             for (const [key, value] of Object.entries(Examples)) {
                 const option = new Option(value.Short, key);
                 s.add(option);
-            console.log(`${key}: ${value.Short}`);
             }
             s.dispatchEvent(new Event("change"));
         }        
@@ -56,5 +53,4 @@
         </div>
     </div>
 </body>
-
 </html>

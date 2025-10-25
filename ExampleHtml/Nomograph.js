@@ -1,6 +1,9 @@
+        // Classes for drawing Nomographs using SVG graphics.
+        // A Nomograph contains multiple Scales; a Scale includes a single Ticks.
+        
         class Ticks
         {
-            constructor(alignment)
+            constructor()
             {
             }
 
@@ -34,6 +37,8 @@
                 }
                 return retval;
             }
+
+
             DrawTicks(scale)
             {
                 let tickLeft = 4;
@@ -54,14 +59,18 @@
                     str = str.replace(".000", "    ");
                     str = str.replace(".00", "   ");
                     str = str.replace(".0", "  ");
-                    scale.DrawText(scale.parent, str, scale.alignment, scale.x_pixel+2, y, scale.tick_textstyle);
+                    scale.DrawText(scale.parent, str, scale.tick_label_alignment, scale.x_pixel+2, y, scale.tick_textstyle);
                 }
 
             }
         }
+
+
+        // Scales are e.g., the U V and W. They are vertical lines with a linear mapping from a "y" value to a pixel value.
+        // The scales will have ticks (see the Ticks class).
         class Scale
         {
-            constructor (svg, name, x_pixel, ystart_pixel, height_pixel, ymin, ymax, title, alignment)
+            constructor (svg, name, x_pixel, ystart_pixel, height_pixel, ymin, ymax, title, tick_label_alignment)
             {
                 this.tick_start = ymin;
                 this.tick_delta = 0.5;
@@ -80,10 +89,10 @@
                 this.ybottom_pixel = this.ystart_pixel + this.height_pixel;
                 this.title = title;
 
-                this.alignment = alignment;
-                if (alignment != "left" && alignment != "right")
+                this.tick_label_alignment = tick_label_alignment;
+                if (tick_label_alignment != "left" && tick_label_alignment != "right")
                 {
-                    console.log(`Error: Scale:Ticks: alignment is ${alignment}. It must be left or right.`);
+                    console.log(`Error: Scale:Ticks: tick_label_alignment is ${tick_label_alignment}. It must be left or right.`);
                 }
 
                 this.tick_textstyle = "font-family:Courier New, monospace;white-space: pre;";
@@ -94,6 +103,8 @@
                 this.ticks = new Ticks();
             }
 
+
+            // Given a Y value (ymin to ymax), return the pixel location
             YToPixel(y)
             {
                 let range = this.ymax - this.ymin;
@@ -102,6 +113,8 @@
                 return retval;
             }
 
+
+            // Given a pixel location, return the corresponding y value.
             PixelToY(ypixel)
             {
                 if (ypixel < this.ystart_pixel) return this.ymax;
@@ -113,12 +126,14 @@
                 return retval;
             }
 
+
             ElementCreate(svg)
             {
                 const child = document.createElementNS(this.svgns, "svg");
                 svg.appendChild(child);
                 return child;
             }
+
 
             /// NOTE: this method might be part of an Scale, but it's "static" and can
             /// be called from anywhere.
@@ -132,6 +147,8 @@
                 parent.appendChild(circle);
                 return circle; // just in case we need to refer to this later.
             }
+
+
             DrawLine(parent, x1_pixel, y1, x2_pixel, y2, style)
             {
                 let y1_pixel = this.YToPixel(y1);
@@ -145,6 +162,7 @@
                 parent.appendChild(line);
                 return line; // just in case we need to refer to this later.
             }
+
 
             /// NOTE: this method might be part of an Scale, but it's "static" and can
             /// be called from anywhere.
@@ -160,14 +178,15 @@
                 return line; // just in case we need to refer to this later.
             }
 
-            DrawText(parent, str, alignment, x, y, style)
+
+            DrawText(parent, str, tick_label_alignment, x, y, style)
             {
-                //console.log(`DrawText: called: str=<<${str}>> alignment=${alignment} x=${x}`);
+                //console.log(`DrawText: called: str=<<${str}>> alignment=${tick_label_alignment} x=${x}`);
                 let x_pixel = x;
                 let y_pixel = this.YToPixel(y);
 
                 const text = document.createElementNS(this.svgns, "text");
-                if (alignment == "left")
+                if (tick_label_alignment == "left")
                 {
                     text.setAttribute("x", x_pixel-8);
                     text.setAttribute("text-anchor", "end");
@@ -189,6 +208,7 @@
                 this.parent.appendChild(text);
                 return text; // just in case we need it later.
             }
+
             
             DrawTitlePixel(parent, str, x, y)
             {
@@ -202,6 +222,7 @@
                 this.parent.appendChild(text);
                 return text; // just in case we need it later.
             }
+
 
             DrawGraduations ()
             {
@@ -229,9 +250,9 @@
 
                 this.ScaleW_pixel = 120;
 
-                this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(svg)
-
+                this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(svg);
             }
+
 
             OnSizeChange()
             {
@@ -264,6 +285,7 @@
                     "U", "left"); 
                 if ("U_tick_delta" in this) this.U.tick_delta = this.U_tick_delta;
                 if ("U_tick_label_delta" in this) this.U.tick_label_delta = this.U_tick_label_delta;
+                if ("U_tick_label_alignment" in this) this.U.tick_label_alignment = this.U_tick_label_alignment;
 
                 this.V = new Scale (this.svg, "V", 
                     this.XV_pixel, 
@@ -272,6 +294,7 @@
                     "V", "right"); 
                 if ("V_tick_delta" in this) this.V.tick_delta = this.V_tick_delta;
                 if ("V_tick_label_delta" in this) this.V.tick_label_delta = this.V_tick_label_delta;
+                if ("V_tick_label_alignment" in this) this.V.tick_label_alignment = this.V_tick_label_alignment;
 
                 this.W = new Scale (this.svg, "W", 
                     this.XW_pixel, 
@@ -280,6 +303,7 @@
                     "W", "right"); 
                 if ("W_tick_delta" in this) this.W.tick_delta = this.W_tick_delta;
                 if ("W_tick_label_delta" in this) this.W.tick_label_delta = this.W_tick_label_delta;
+                if ("W_tick_label_alignment" in this) this.W.tick_label_alignment = this.W_tick_label_alignment;
 
                 this.cursor_style = "stroke:blue; fill:none; stroke-width:4px"; 
                 this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";

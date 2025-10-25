@@ -4,8 +4,7 @@ Contains exploratory code for making a variety of Nomographs. Examples are from 
 
 ## Simple TODO items
 
-Make this available on Github Pages
-
+DONE: 2025-10-25: Setup to make this available on Github Pages. Clean up code and make diagraph 32 bottom.
 DONE: 2025-10-25: Allow user to pick from a set of options. The set is easy to update.
 DONE: 2025-10-24: Can move the cursor around.
 DONE: 2025-10-24: Resize. On size changes, redraw.
