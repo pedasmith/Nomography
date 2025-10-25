@@ -356,29 +356,3 @@
             }
 
         }
-
-        function MakePage_30Diagram(svg)
-        {
-            var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0); // U scale is 0..4 V scale is 0..6
-            nomograph.W_tick_delta = 1.0;
-            nomograph.W_tick_label_delta = 2;
-            nomograph.Initialize();
-            return nomograph;
-        }
-
-        function MakePage_32Diagram(svg)
-        {
-            var nomograph = new NomographTypeI(svg, -3.0, 0.5, -2.0, 1.5); // U scale is -3..0.5 V scale is -2..0.5
-            nomograph.U_tick_delta = 0.25;
-            nomograph.V_tick_delta = 0.25;
-            nomograph.W_tick_delta = 0.50;
-            nomograph.Initialize();
-            return nomograph;
-        }
-
-        function OnLoad()
-        {
-            let svg = document.getElementById("nomo");
-            MakePage_32Diagram(svg);
-        }
-
