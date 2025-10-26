@@ -79,7 +79,6 @@ function MakePage_32TopDiagram(svg)
 
 function MakePage_32BottomDiagram(svg)
 {
-    console.log(`DBG: 32bottom: called`);
     var uTickSettings = new TickSettings();
     uTickSettings.tick_delta = 0.25;
     var vTickSettings = new TickSettings(uTickSettings);
@@ -90,7 +89,6 @@ function MakePage_32BottomDiagram(svg)
     var nomograph = new NomographTypeI(svg, 12.0, 15.5, 24, 27.5,
         uTickSettings, vTickSettings, wTickSettings); 
     nomograph.Initialize();
-    console.log(`DBG: 32bottom: returning`);
     return nomograph;
 }
 

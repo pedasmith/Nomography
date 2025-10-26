@@ -113,21 +113,12 @@
             {
                 this.svg = svg;
                 this.name = name;
-
-                // All these are now in tick_settings
-                //this.tick_first = ymin;
-                //this.tick_delta = 0.5;
-                //this.tick_precision = 1;
-                //this.tick_label_first = ymin;
-                //this.tick_label_delta = 1.0;
-                //this.tick_label_alignment = "????";
-                this.tick_settings = tick_settings;
-
                 this.ymin = ymin;
                 this.ymax = ymax;
 
                 // Some of the tick settings have a default values from the scale.
                 // For example, tick_first is usually scale.ymin, but sometimes isn't.
+                this.tick_settings = tick_settings;
                 this.tick_settings.Update(this, default_label_alignment);
 
                 this.direction = "up"; // either "up" or "down". Default is down.
@@ -358,11 +349,6 @@
                     this.umin, this.umax, 
                     "U", "left", this.u_tick_settings); 
                 if ("U_direction" in this) this.U.direction = this.U_direction;
-                //if ("U_tick_delta" in this) this.U.tick_delta = this.U_tick_delta;
-                //if ("U_tick_first" in this) this.U.tick_first = this.U_tick_first;
-                //if ("U_tick_label_delta" in this) this.U.tick_label_delta = this.U_tick_label_delta;
-                //if ("U_tick_label_alignment" in this) this.U.tick_label_alignment = this.U_tick_label_alignment;
-                //if ("U_tick_label_first" in this) this.U.tick_label_first = this.U_tick_label_first;
 
                 this.V = new Scale (this.svg, "V", 
                     this.XV_pixel, 
@@ -370,11 +356,6 @@
                     this.vmin, this.vmax, 
                     "V", "right", this.v_tick_settings); 
                 if ("V_direction" in this) this.V.direction = this.V_direction;
-                //if ("V_tick_delta" in this) this.V.tick_delta = this.V_tick_delta;
-                //if ("V_tick_first" in this) this.V.tick_first = this.V_tick_first;
-                //if ("V_tick_label_delta" in this) this.V.tick_label_delta = this.V_tick_label_delta;
-                //if ("V_tick_label_alignment" in this) this.V.tick_label_alignment = this.V_tick_label_alignment;
-                //if ("V_tick_label_first" in this) this.V.tick_label_first = this.V_tick_label_first;
 
                 this.W = new Scale (this.svg, "W", 
                     this.XW_pixel, 
@@ -382,11 +363,6 @@
                     this.wmin, this.wmax, 
                     "W", "right", this.w_tick_settings); 
                 if ("W_direction" in this) this.W.direction = this.W_direction;
-                //if ("W_tick_delta" in this) this.W.tick_delta = this.W_tick_delta;
-                //if ("W_tick_first" in this) this.W.tick_first = this.W_tick_first;
-                //if ("W_tick_label_delta" in this) this.W.tick_label_delta = this.W_tick_label_delta;
-                //if ("W_tick_label_alignment" in this) this.W.tick_label_alignment = this.W_tick_label_alignment;
-                //if ("W_tick_label_first" in this) this.W.tick_label_first = this.W_tick_label_first;
 
                 this.cursor_style = "stroke:blue; fill:none; stroke-width:4px"; 
                 this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";
