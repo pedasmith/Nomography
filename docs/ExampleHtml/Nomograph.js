@@ -298,7 +298,9 @@
                 let h_pixel = height - this.HTitle_pixel - this.HFooter_pixel;
                 let h_per_unit_u = h_pixel / (this.umax - this.umin); 
                 let h_per_unit_v = h_pixel / (this.vmax - this.vmin);
-                let h_per_unit = h_per_unit_u < h_per_unit_v ? h_per_unit_u : h_per_unit_v; 
+                let h_per_unit_w = h_pixel / (this.wmax - this.wmin);
+                let h_per_unit_right = (this.order == "UVW") ? h_per_unit_w : h_per_unit_v;
+                let h_per_unit = Math.min (h_per_unit_u, h_per_unit_right); 
 
                 this.U = new Scale (this.svg, "U", 
                     this.XU_pixel, 
