@@ -44,83 +44,113 @@ const Examples = {
         "Title": "Page 38 example nomograph",
         "Details": "Radical change: with UVW scales, the V scale is in the middle. For this to work, the V and W scales are inverted, the V scaling is like the classic W scaling and the W scaling is like the classes V scaling.",
         "Create": MakePage_38Diagram
-    }
+    },
+
 }
 
 
 function MakePage_30Diagram(svg)
 {
-    var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0); // U scale is 0..4 V scale is 0..6
-    nomograph.W_tick_delta = 1.0;
-    nomograph.W_tick_label_delta = 2;
+    var uTickSettings = new TickSettings();
+    var vTickSettings = new TickSettings(uTickSettings);
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 1.0;
+    wTickSettings.tick_label_delta = 2;
+
+    var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0,
+        uTickSettings, vTickSettings, wTickSettings); // U scale is 0..4 V scale is 0..6
     nomograph.Initialize();
     return nomograph;
 }
 
 function MakePage_32TopDiagram(svg)
 {
-    var nomograph = new NomographTypeI(svg, -3.0, 0.5, -2.0, 1.5); // U scale is -3..0.5 V scale is -2..0.5
-    nomograph.U_tick_delta = 0.25;
-    nomograph.V_tick_delta = 0.25;
-    nomograph.W_tick_delta = 0.50;
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 0.25;
+    var vTickSettings = new TickSettings(uTickSettings);
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 0.50;
+
+    var nomograph = new NomographTypeI(svg, -3.0, 0.5, -2.0, 1.5,
+        uTickSettings, vTickSettings, wTickSettings); // U scale is -3..0.5 V scale is -2..0.5
     nomograph.Initialize();
     return nomograph;
 }
 
 function MakePage_32BottomDiagram(svg)
 {
-    var nomograph = new NomographTypeI(svg, 12.0, 15.5, 24, 27.5); 
-    nomograph.U_tick_delta = 0.25;
-    nomograph.V_tick_delta = 0.25;
-    nomograph.W_tick_delta = 0.50;
-    nomograph.W_tick_label_alignment ="left";
+    console.log(`DBG: 32bottom: called`);
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 0.25;
+    var vTickSettings = new TickSettings(uTickSettings);
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 0.50;
+    wTickSettings.tick_label_alignment ="left";
+
+    var nomograph = new NomographTypeI(svg, 12.0, 15.5, 24, 27.5,
+        uTickSettings, vTickSettings, wTickSettings); 
     nomograph.Initialize();
+    console.log(`DBG: 32bottom: returning`);
     return nomograph;
 }
 
 function MakePage_34Diagram(svg)
 {
-    var nomograph = new NomographTypeI(svg, 0.0, 12.0, 0.0, 12.0); 
-    nomograph.U_tick_delta = 0.5;
-    nomograph.V_tick_delta = 0.5;
-    nomograph.W_tick_delta = 1.;
-    nomograph.U_tick_label_delta = 2.0;
-    nomograph.V_tick_label_delta = 2.0;
-    nomograph.W_tick_label_delta = 2.0;
-    nomograph.W_tick_label_alignment ="left";
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 0.5;
+    uTickSettings.tick_label_delta = 2.0;
+
+    var vTickSettings = new TickSettings(uTickSettings);
+
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 1.;
+    wTickSettings.tick_label_alignment ="left";
+
+    var nomograph = new NomographTypeI(svg, 0.0, 12.0, 0.0, 12.0,
+        uTickSettings, vTickSettings, wTickSettings); 
     nomograph.Initialize();
     return nomograph;
 }
 
 function MakePage_36Diagram(svg)
 {
-    var nomograph = new NomographTypeI(svg, -27.0, 9.0, 18.0, 54.0); 
-    nomograph.U_tick_delta = 1.0;
-    nomograph.V_tick_delta = 1.0;
-    nomograph.W_tick_delta = 2.0;
-    nomograph.W_tick_first = -8.0; // otherwise the ticks are offset from the labels
-    nomograph.U_tick_label_delta = 10.0;
-    nomograph.V_tick_label_delta = 10.0;
-    nomograph.W_tick_label_delta = 10.0;
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 1.0;
+    uTickSettings.tick_label_delta = 10.0;
+    uTickSettings.tick_label_first = -20.0;
 
-    nomograph.U_tick_label_first = -20.0;
-    nomograph.V_tick_label_first = 20.0;
-    nomograph.W_tick_label_first = 0.0;
-    nomograph.W_tick_label_alignment ="left";
+    var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_label_first = 20.0;
+    vTickSettings.tick_label_alignment = "left"; // this is actually an issue with the diagram
+
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 2.0;
+    wTickSettings.tick_first = -8.0; // otherwise the ticks are offset from the labels
+    wTickSettings.tick_label_first = 0.0;
+    wTickSettings.tick_label_alignment ="left";
+
+    var nomograph = new NomographTypeI(svg, -27.0, 9.0, 18.0, 54.0,
+        uTickSettings, vTickSettings, wTickSettings);
     nomograph.Initialize();
     return nomograph;
 }
 
 function MakePage_38Diagram(svg)
 {
-    var nomograph = new NomographTypeI(svg, -2.0, 2.0, -4.0, 4.0); 
+    var uTickSettings = new TickSettings();
+    var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_label_alignment = "left";
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_label_alignment = "left";
+
+    var nomograph = new NomographTypeI(svg, -2.0, 2.0, -4.0, 4.0,
+        uTickSettings, vTickSettings, wTickSettings);
     nomograph.order = "UVW"; // allowed: UWV default or UVW
     nomograph.wmin = -2;
     nomograph.wmax = 2;
     // UVW also sets the direction of V and W to "down"
     // and sets their scale correctly.
 
-    nomograph.V_tick_label_alignment = "left";
     nomograph.Initialize();
     return nomograph;
 }

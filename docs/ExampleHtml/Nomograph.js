@@ -44,24 +44,63 @@
                 let tickLeft = 4;
                 let tickRight = 4;
 
-                for (let y = scale.tick_first; y<=scale.ymax; y+=scale.tick_delta)
+                for (let y = scale.tick_settings.tick_first; y<=scale.ymax; y+=scale.tick_settings.tick_delta)
                 {
                     tickLeft = this.TickSize(y, scale);
                     tickRight = tickLeft;
                     scale.DrawLine(scale.parent, scale.x_pixel-tickLeft, y, scale.x_pixel+tickRight, y, scale.linestyle);
                 }
 
-                for (let y = scale.tick_label_first; y<=scale.ymax; y+=scale.tick_label_delta)
+                for (let y = scale.tick_settings.tick_label_first; y<=scale.ymax; y+=scale.tick_settings.tick_label_delta)
                 {
-                    var str = y.toFixed(scale.tick_precision);
+                    var str = y.toFixed(scale.tick_settings.tick_precision);
                     // This qualifies as a code issue for Daily WTF. But it's quick and it works for now.
                     str = str.replace(".0000", "     ");
                     str = str.replace(".000", "    ");
                     str = str.replace(".00", "   ");
                     str = str.replace(".0", "  ");
-                    scale.DrawText(scale.parent, str, scale.tick_label_alignment, scale.x_pixel+2, y, scale.tick_textstyle);
+                    scale.DrawText(scale.parent, str, scale.tick_settings.tick_label_alignment, scale.x_pixel+2, y, scale.tick_textstyle);
                 }
 
+            }
+        }
+
+        class TickSettings
+        {
+            constructor(optionalValue)
+            {
+                this.tick_first = undefined;
+                this.tick_delta = 0.5;
+                this.tick_precision = 1;
+                this.tick_label_first = undefined;
+                this.tick_label_delta = 1.0;
+                this.tick_label_alignment = undefined;
+
+                if (optionalValue != undefined)
+                {
+                    this.tick_first = optionalValue.tick_first;
+                    this.tick_delta = optionalValue.tick_delta;
+                    this.tick_precision = optionalValue.tick_precision;
+                    this.tick_label_first = optionalValue.tick_label_first;
+                    this.tick_label_delta = optionalValue.tick_label_delta;
+                    this.tick_label_alignment = optionalValue.tick_label_alignment;
+                }
+            }
+
+            Update(scale, default_label_alignment)
+            {
+                if (this.tick_first == undefined)
+                {
+                    this.tick_first = scale.ymin;
+                }
+                if (this.tick_label_first == undefined)
+                {
+                    this.tick_label_first = scale.ymin;
+                }
+                if (this.tick_label_alignment == undefined)
+                {
+                    this.tick_label_alignment = default_label_alignment;
+                }
             }
         }
 
@@ -70,31 +109,39 @@
         // The scales will have ticks (see the Ticks class).
         class Scale
         {
-            constructor (svg, name, x_pixel, ystart_pixel, height_pixel, ymin, ymax, title, tick_label_alignment)
+            constructor (svg, name, x_pixel, ystart_pixel, height_pixel, ymin, ymax, title, default_label_alignment, tick_settings)
             {
-                this.tick_first = ymin;
-                this.tick_delta = 0.5;
-                this.tick_precision = 1;
-                this.tick_label_first = ymin;
-                this.tick_label_delta = 1.0;
+                this.svg = svg;
+                this.name = name;
+
+                // All these are now in tick_settings
+                //this.tick_first = ymin;
+                //this.tick_delta = 0.5;
+                //this.tick_precision = 1;
+                //this.tick_label_first = ymin;
+                //this.tick_label_delta = 1.0;
+                //this.tick_label_alignment = "????";
+                this.tick_settings = tick_settings;
 
                 this.ymin = ymin;
                 this.ymax = ymax;
 
+                // Some of the tick settings have a default values from the scale.
+                // For example, tick_first is usually scale.ymin, but sometimes isn't.
+                this.tick_settings.Update(this, default_label_alignment);
+
                 this.direction = "up"; // either "up" or "down". Default is down.
 
-                this.svg = svg;
-                this.name = name;
                 this.x_pixel = x_pixel;
                 this.ystart_pixel = ystart_pixel; // this is at the top (e.g., y pixel pos of ymax)
                 this.height_pixel = height_pixel;
                 this.ybottom_pixel = this.ystart_pixel + this.height_pixel;
                 this.title = title;
 
-                this.tick_label_alignment = tick_label_alignment;
-                if (tick_label_alignment != "left" && tick_label_alignment != "right")
+                // is handled in settings now: TODO: remove: this.tick_label_alignment = tick_label_alignment;
+                if (tick_settings.tick_label_alignment != "left" && tick_settings.tick_label_alignment != "right")
                 {
-                    console.log(`Error: Scale:Ticks: tick_label_alignment is ${tick_label_alignment}. It must be left or right.`);
+                    console.log(`Error: Scale:Ticks: tick_label_alignment is ${tick_settings.tick_label_alignment}. It must be left or right.`);
                 }
 
                 this.tick_textstyle = "font-family:Courier New, monospace;white-space: pre;";
@@ -239,7 +286,7 @@
 
         class NomographTypeI
         {
-            constructor(svg, umin, umax, vmin, vmax)
+            constructor(svg, umin, umax, vmin, vmax, u_tick_settings, v_tick_settings, w_tick_settings)
             {
                 this.svg = svg;
                 this.umin = umin;
@@ -254,6 +301,9 @@
 
                 this.ScaleW_pixel = 120;
 
+                this.u_tick_settings = u_tick_settings;
+                this.v_tick_settings = v_tick_settings;
+                this.w_tick_settings = w_tick_settings;
                 this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(svg);
             }
 
@@ -306,37 +356,37 @@
                     this.XU_pixel, 
                     this.HTitle_pixel, h_per_unit*(this.umax-this.umin), 
                     this.umin, this.umax, 
-                    "U", "left"); 
+                    "U", "left", this.u_tick_settings); 
                 if ("U_direction" in this) this.U.direction = this.U_direction;
-                if ("U_tick_delta" in this) this.U.tick_delta = this.U_tick_delta;
-                if ("U_tick_first" in this) this.U.tick_first = this.U_tick_first;
-                if ("U_tick_label_delta" in this) this.U.tick_label_delta = this.U_tick_label_delta;
-                if ("U_tick_label_alignment" in this) this.U.tick_label_alignment = this.U_tick_label_alignment;
-                if ("U_tick_label_first" in this) this.U.tick_label_first = this.U_tick_label_first;
+                //if ("U_tick_delta" in this) this.U.tick_delta = this.U_tick_delta;
+                //if ("U_tick_first" in this) this.U.tick_first = this.U_tick_first;
+                //if ("U_tick_label_delta" in this) this.U.tick_label_delta = this.U_tick_label_delta;
+                //if ("U_tick_label_alignment" in this) this.U.tick_label_alignment = this.U_tick_label_alignment;
+                //if ("U_tick_label_first" in this) this.U.tick_label_first = this.U_tick_label_first;
 
                 this.V = new Scale (this.svg, "V", 
                     this.XV_pixel, 
                     this.HTitle_pixel, h_per_unit*(this.vmax-this.vmin)  / v_scale, 
                     this.vmin, this.vmax, 
-                    "V", "right"); 
+                    "V", "right", this.v_tick_settings); 
                 if ("V_direction" in this) this.V.direction = this.V_direction;
-                if ("V_tick_delta" in this) this.V.tick_delta = this.V_tick_delta;
-                if ("V_tick_first" in this) this.V.tick_first = this.V_tick_first;
-                if ("V_tick_label_delta" in this) this.V.tick_label_delta = this.V_tick_label_delta;
-                if ("V_tick_label_alignment" in this) this.V.tick_label_alignment = this.V_tick_label_alignment;
-                if ("V_tick_label_first" in this) this.V.tick_label_first = this.V_tick_label_first;
+                //if ("V_tick_delta" in this) this.V.tick_delta = this.V_tick_delta;
+                //if ("V_tick_first" in this) this.V.tick_first = this.V_tick_first;
+                //if ("V_tick_label_delta" in this) this.V.tick_label_delta = this.V_tick_label_delta;
+                //if ("V_tick_label_alignment" in this) this.V.tick_label_alignment = this.V_tick_label_alignment;
+                //if ("V_tick_label_first" in this) this.V.tick_label_first = this.V_tick_label_first;
 
                 this.W = new Scale (this.svg, "W", 
                     this.XW_pixel, 
                     this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) / w_scale, 
                     this.wmin, this.wmax, 
-                    "W", "right"); 
+                    "W", "right", this.w_tick_settings); 
                 if ("W_direction" in this) this.W.direction = this.W_direction;
-                if ("W_tick_delta" in this) this.W.tick_delta = this.W_tick_delta;
-                if ("W_tick_first" in this) this.W.tick_first = this.W_tick_first;
-                if ("W_tick_label_delta" in this) this.W.tick_label_delta = this.W_tick_label_delta;
-                if ("W_tick_label_alignment" in this) this.W.tick_label_alignment = this.W_tick_label_alignment;
-                if ("W_tick_label_first" in this) this.W.tick_label_first = this.W_tick_label_first;
+                //if ("W_tick_delta" in this) this.W.tick_delta = this.W_tick_delta;
+                //if ("W_tick_first" in this) this.W.tick_first = this.W_tick_first;
+                //if ("W_tick_label_delta" in this) this.W.tick_label_delta = this.W_tick_label_delta;
+                //if ("W_tick_label_alignment" in this) this.W.tick_label_alignment = this.W_tick_label_alignment;
+                //if ("W_tick_label_first" in this) this.W.tick_label_first = this.W_tick_label_first;
 
                 this.cursor_style = "stroke:blue; fill:none; stroke-width:4px"; 
                 this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";
