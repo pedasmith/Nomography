@@ -209,7 +209,8 @@ function MakePage_47Diagram(svg)
 
     var nomograph = new NomographTypeI(svg, -100, 200, 30, 60,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.v_zoom = 0.1;
+    //nomograph.v_zoom = 0.1;
+    nomograph.v_autozoom = true;
     nomograph.Initialize();
     return nomograph;
 }
