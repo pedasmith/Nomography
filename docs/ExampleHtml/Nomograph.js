@@ -46,8 +46,9 @@
 
                 for (let y = scale.tick_settings.tick_first; y<=scale.ymax; y+=scale.tick_settings.tick_delta)
                 {
-                    tickLeft = this.TickSize(y, scale);
-                    tickRight = tickLeft;
+                    const ticksize = this.TickSize(y, scale)
+                    tickLeft = scale.tick_settings.tick_side.includes("left") ? ticksize : 0;
+                    tickRight = scale.tick_settings.tick_side.includes("right") ? ticksize : 0;
                     scale.DrawLine(scale.parent, scale.x_pixel-tickLeft, y, scale.x_pixel+tickRight, y, scale.linestyle);
                 }
 
@@ -72,8 +73,9 @@
                 this.tick_first = undefined;
                 this.tick_delta = 0.5;
                 this.tick_precision = 1;
+                this.tick_side = "left+right";
                 this.tick_label_first = undefined;
-                this.tick_label_delta = 1.0;
+                this.tick_label_delta = undefined;
                 this.tick_label_alignment = undefined;
 
                 if (optionalValue != undefined)
@@ -81,6 +83,7 @@
                     this.tick_first = optionalValue.tick_first;
                     this.tick_delta = optionalValue.tick_delta;
                     this.tick_precision = optionalValue.tick_precision;
+                    this.tick_side = optionalValue.tick_side;
                     this.tick_label_first = optionalValue.tick_label_first;
                     this.tick_label_delta = optionalValue.tick_label_delta;
                     this.tick_label_alignment = optionalValue.tick_label_alignment;
@@ -92,6 +95,10 @@
                 if (this.tick_first == undefined)
                 {
                     this.tick_first = scale.ymin;
+                }
+                if (this.tick_label_delta == undefined)
+                {
+                    this.tick_label_delta = this.tick_delta;
                 }
                 if (this.tick_label_first == undefined)
                 {
@@ -280,6 +287,7 @@
             constructor(svg, umin, umax, vmin, vmax, u_tick_settings, v_tick_settings, w_tick_settings)
             {
                 this.svg = svg;
+
                 this.umin = umin;
                 this.umax = umax;
                 this.vmin = vmin;
@@ -287,10 +295,12 @@
                 this.wmin = this.umin + this.vmin;
                 this.wmax = this.umax + this.vmax;
 
+                this.alpha = 0.5; // where does the middle scale go? 0.5=middle 0.1=far on the left 0.9=far on right
+
                 this.HTitle_pixel = 20;
                 this.HFooter_pixel = 20;
 
-                this.ScaleW_pixel = 120;
+                this.ScaleUV_pixel = 240;
 
                 this.u_tick_settings = u_tick_settings;
                 this.v_tick_settings = v_tick_settings;
@@ -314,13 +324,36 @@
                 //let height= this.svg.offsetHeight;
                 let height= this.svg.getBoundingClientRect().height;
 
-                this.XU_pixel = 40;
-                this.XW_pixel = this.XU_pixel + this.ScaleW_pixel;
-                this.XV_pixel = this.XU_pixel + 2*this.ScaleW_pixel;
+                this.XU_pixel = 70;
+                this.XW_pixel = this.XU_pixel + (this.alpha * this.ScaleUV_pixel);
+                this.XV_pixel = this.XU_pixel + this.ScaleUV_pixel;
                 this.XRight_pixel = this.XV_pixel;
 
-                let v_scale = 1.0;
-                let w_scale = 2.0;
+                console.log(`DBG: Initialize: XU=${this.XU_pixel} XW=${this.XW_pixel} XV=${this.XV_pixel}`);
+
+                let v_scale = (this.vmax-this.vmin) / (this.umax-this.umin);
+
+                // if a=1 and b=10 then alpha=a/b=1/11=0.0909
+                // assuming a=1 given alpha, b=a/alpha
+
+                const a = 1.0;
+                const b = a / this.alpha;
+                console.log(`DBG: alpha=${this.alpha} a=${a} b=${b} a/b=${a/b} b/a=${b/a}`);
+
+                let u_scale = 1.0;
+                //let v_scale = u_scale; // * 0.1; //(b / a);
+                let w_scale = u_scale * 1.1;
+
+                if (this.alpha == 0.5)
+                {
+                    u_scale = 1.0;
+                    v_scale = u_scale;
+                    w_scale = 2.0;
+                }
+                // alpha  w_scale   v_scale
+                //  0.5     * 2.0   1.0
+                //  0.0909     * 1.1   0.1
+                //  0.1 2=much too short 1=a little too long
 
                 if (this.order == "UVW")
                 {

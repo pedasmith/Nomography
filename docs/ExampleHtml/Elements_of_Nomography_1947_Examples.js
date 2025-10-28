@@ -46,6 +46,27 @@ const Examples = {
         "Create": MakePage_38Diagram
     },
 
+    "page 47": {
+        "Short": "Page 47",
+        "Title": "Page 47 example nomograph",
+        "Details": "The W scale can be positioned at points other than the .5 halfway point",
+        "Create": MakePage_47Diagram
+    },
+
+    "page 45": {
+        "Short": "Page 45",
+        "Title": "Page 45 example nomograph",
+        "Details": "The W scale can be positioned at points other than the .5 halfway point",
+        "Create": MakePage_45Diagram
+    },
+    "DBG": {
+        "Short": "DBG",
+        "Title": "DBG: Page 30 example nomograph",
+        "Details": "This nomograph is a recreation of the first nomograph discussed in the book, on page 30. Set the 'cursor' to be at any number on the U and V scales, and the answer W = U + V can be read from the W scale. ",
+        "Create": MakePage_30Diagram
+    },
+
+
 }
 
 
@@ -57,8 +78,9 @@ function MakePage_30Diagram(svg)
     wTickSettings.tick_delta = 1.0;
     wTickSettings.tick_label_delta = 2;
 
+    // U scale is 0..4 V scale is 0..6
     var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0,
-        uTickSettings, vTickSettings, wTickSettings); // U scale is 0..4 V scale is 0..6
+        uTickSettings, vTickSettings, wTickSettings); 
     nomograph.Initialize();
     return nomograph;
 }
@@ -71,8 +93,9 @@ function MakePage_32TopDiagram(svg)
     var wTickSettings = new TickSettings(uTickSettings);
     wTickSettings.tick_delta = 0.50;
 
+    // U scale is -3..0.5 V scale is -2..0.5
     var nomograph = new NomographTypeI(svg, -3.0, 0.5, -2.0, 1.5,
-        uTickSettings, vTickSettings, wTickSettings); // U scale is -3..0.5 V scale is -2..0.5
+        uTickSettings, vTickSettings, wTickSettings); 
     nomograph.Initialize();
     return nomograph;
 }
@@ -153,6 +176,48 @@ function MakePage_38Diagram(svg)
     return nomograph;
 }
 
+function MakePage_45Diagram(svg)
+{
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 0.1;
+    uTickSettings.tick_label_delta = 1;
+    uTickSettings.tick_side = "left";
+    var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_delta = 0.2;
+    vTickSettings.tick_label_delta = 2;
+    vTickSettings.tick_side="left+right";
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 0.5;
+    wTickSettings.tick_label_delta = 3;
+    wTickSettings.tick_side = "right";
 
+    var nomograph = new NomographTypeI(svg, 0.0, 6.0, 0.0, 12,
+        uTickSettings, vTickSettings, wTickSettings); 
+    //nomograph.alpha = 1.0 / 11.0;
+    nomograph.Initialize();
+    return nomograph;
+}
 
+function MakePage_47Diagram(svg)
+{
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 5;
+    uTickSettings.tick_label_delta = 50;
+    uTickSettings.tick_side = "left";
+    var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_delta = 0.5;
+    vTickSettings.tick_label_delta = 5;
+    vTickSettings.tick_side="left+right";
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 10;
+    wTickSettings.tick_label_delta = 50;
+    wTickSettings.tick_label_first = -50;
+    wTickSettings.tick_side = "right";
+
+    var nomograph = new NomographTypeI(svg, -100, 200, 30, 60,
+        uTickSettings, vTickSettings, wTickSettings); 
+    nomograph.alpha = 1.0 / 11.0;
+    nomograph.Initialize();
+    return nomograph;
+}
 
