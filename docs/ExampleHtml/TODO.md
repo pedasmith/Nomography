@@ -4,7 +4,7 @@ Contains exploratory code for making a variety of Nomographs. Examples are from 
 
 ## Simple TODO items
 
-The Page 45 graph has weird looking V ticks. They should have maxes at 1, 2, 3 etc. but don't.
+The Page 45 graph has weird looking V ticks. They should have maxes at 1, 2, 3 etc. but don't. Maybe it's the text bounding boxes?
 
 Handle the case where the V and U scales are different (e.g.: U is 0..6 V is 0..12).
 

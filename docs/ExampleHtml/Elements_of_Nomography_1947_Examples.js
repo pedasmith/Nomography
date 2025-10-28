@@ -46,26 +46,19 @@ const Examples = {
         "Create": MakePage_38Diagram
     },
 
-    "page 47": {
-        "Short": "Page 47",
-        "Title": "Page 47 example nomograph",
-        "Details": "The W scale can be positioned at points other than the .5 halfway point",
-        "Create": MakePage_47Diagram
-    },
-
     "page 45": {
         "Short": "Page 45",
-        "Title": "Page 45 example nomograph",
-        "Details": "The W scale can be positioned at points other than the .5 halfway point",
+        "Title": "Page 45 example nomograph type II",
+        "Details": "The W scale can be positioned at points other than the .5 halfway point. The V scale is set to be zoom=2 so that a single unit jump on the U scale is 2 units on the V scale. ",
         "Create": MakePage_45Diagram
     },
-    "DBG": {
-        "Short": "DBG",
-        "Title": "DBG: Page 30 example nomograph",
-        "Details": "This nomograph is a recreation of the first nomograph discussed in the book, on page 30. Set the 'cursor' to be at any number on the U and V scales, and the answer W = U + V can be read from the W scale. ",
-        "Create": MakePage_30Diagram
-    },
 
+    "page 47": {
+        "Short": "Page 47",
+        "Title": "Page 47 example nomograph type II",
+        "Details": "The W scale can be positioned at points other than the .5 halfway point. The V scale is set to be zoom=0.10 so that a 10 unit jump on the U scale is a single unit on the V scale.",
+        "Create": MakePage_47Diagram
+    },
 
 }
 
@@ -193,7 +186,7 @@ function MakePage_45Diagram(svg)
 
     var nomograph = new NomographTypeI(svg, 0.0, 6.0, 0.0, 12,
         uTickSettings, vTickSettings, wTickSettings); 
-    //nomograph.alpha = 1.0 / 11.0;
+    nomograph.v_zoom = 2; // when the U goes up by 1, the V should go up by 2
     nomograph.Initialize();
     return nomograph;
 }
@@ -216,7 +209,7 @@ function MakePage_47Diagram(svg)
 
     var nomograph = new NomographTypeI(svg, -100, 200, 30, 60,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.alpha = 1.0 / 11.0;
+    nomograph.v_zoom = 0.1;
     nomograph.Initialize();
     return nomograph;
 }

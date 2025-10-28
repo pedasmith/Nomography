@@ -295,7 +295,11 @@
                 this.wmin = this.umin + this.vmin;
                 this.wmax = this.umax + this.vmax;
 
+                // Values used to make a type II nomograph
+                this.u_zoom = 1.0;
+                this.v_zoom = 1.0;
                 this.alpha = 0.5; // where does the middle scale go? 0.5=middle 0.1=far on the left 0.9=far on right
+                // it will be calculated in Initialize based on the u_zoom and v_zoom. 
 
                 this.HTitle_pixel = 20;
                 this.HFooter_pixel = 20;
@@ -331,29 +335,18 @@
 
                 console.log(`DBG: Initialize: XU=${this.XU_pixel} XW=${this.XW_pixel} XV=${this.XV_pixel}`);
 
-                let v_scale = (this.vmax-this.vmin) / (this.umax-this.umin);
-
-                // if a=1 and b=10 then alpha=a/b=1/11=0.0909
-                // assuming a=1 given alpha, b=a/alpha
-
-                const a = 1.0;
-                const b = a / this.alpha;
-                console.log(`DBG: alpha=${this.alpha} a=${a} b=${b} a/b=${a/b} b/a=${b/a}`);
-
                 let u_scale = 1.0;
-                //let v_scale = u_scale; // * 0.1; //(b / a);
-                let w_scale = u_scale * 1.1;
+                let v_scale = u_scale / this.v_zoom;
+                let w_scale = 0.5;
 
-                if (this.alpha == 0.5)
+                let make_type_II = u_scale != v_scale;
+                //make_type_II = false;
+                if (make_type_II)
                 {
-                    u_scale = 1.0;
-                    v_scale = u_scale;
-                    w_scale = 2.0;
+                    w_scale = (u_scale * v_scale) / (u_scale + v_scale);
+                    this.alpha = u_scale / (u_scale + v_scale);
                 }
-                // alpha  w_scale   v_scale
-                //  0.5     * 2.0   1.0
-                //  0.0909     * 1.1   0.1
-                //  0.1 2=much too short 1=a little too long
+                console.log(`DBG: Initialize: II=${make_type_II} alpha=${this.alpha} scale u=${u_scale} v=${v_scale} w=${w_scale}`);
 
                 if (this.order == "UVW")
                 {
@@ -365,34 +358,35 @@
                     this.V_direction = "down";
                     this.W_direction = "down";
 
-                    v_scale = 2.0;
-                    w_scale = 1.0;
+                    temp = v_scale;
+                    v_scale = w_scale;
+                    w_scale = temp;
                 }
 
                 let h_pixel = height - this.HTitle_pixel - this.HFooter_pixel;
-                let h_per_unit_u = h_pixel / (this.umax - this.umin); 
-                let h_per_unit_v = h_pixel / (this.vmax - this.vmin);
-                let h_per_unit_w = h_pixel / (this.wmax - this.wmin);
+                let h_per_unit_u = h_pixel / ((this.umax - this.umin) * u_scale); 
+                let h_per_unit_v = h_pixel / ((this.vmax - this.vmin) * v_scale);
+                let h_per_unit_w = h_pixel / ((this.wmax - this.wmin) * w_scale);
                 let h_per_unit_right = (this.order == "UVW") ? h_per_unit_w : h_per_unit_v;
                 let h_per_unit = Math.min (h_per_unit_u, h_per_unit_right); 
 
                 this.U = new Scale (this.svg, "U", 
                     this.XU_pixel, 
-                    this.HTitle_pixel, h_per_unit*(this.umax-this.umin), 
+                    this.HTitle_pixel, h_per_unit*(this.umax-this.umin) * u_scale, 
                     this.umin, this.umax, 
                     "U", "left", this.u_tick_settings); 
                 if ("U_direction" in this) this.U.direction = this.U_direction;
 
                 this.V = new Scale (this.svg, "V", 
                     this.XV_pixel, 
-                    this.HTitle_pixel, h_per_unit*(this.vmax-this.vmin)  / v_scale, 
+                    this.HTitle_pixel, h_per_unit*(this.vmax-this.vmin)  * v_scale, 
                     this.vmin, this.vmax, 
                     "V", "right", this.v_tick_settings); 
                 if ("V_direction" in this) this.V.direction = this.V_direction;
 
                 this.W = new Scale (this.svg, "W", 
                     this.XW_pixel, 
-                    this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) / w_scale, 
+                    this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) * w_scale, 
                     this.wmin, this.wmax, 
                     "W", "right", this.w_tick_settings); 
                 if ("W_direction" in this) this.W.direction = this.W_direction;
