@@ -50,7 +50,7 @@
                 let tickLeft = 4;
                 let tickRight = 4;
 
-                console.log(`NOTE: Ticks: scale=${scale.name} first=${scale.tick_settings.tick_first} ymax=${scale.ymax} delta=${scale.tick_settings.tick_delta}`);
+                // console.log(`NOTE: Ticks: scale=${scale.name} first=${scale.tick_settings.tick_first} ymax=${scale.ymax} delta=${scale.tick_settings.tick_delta}`);
                 for (let y = scale.tick_settings.tick_first; y<=scale.ymax; y+=scale.tick_settings.tick_delta)
                 {
                     const ticksize = this.TickSize(y, scale)
@@ -303,11 +303,9 @@
                 this.wmax = this.umax + this.vmax;
 
                 // Values used to make a type II nomograph
-                this.v_autozoom = false; // when true makes U and V same pixel size with correct v_zoom settings.
-                this.u_zoom = 1.0;
                 this.v_zoom = 1.0;
-                this.alpha = 0.5; // where does the middle scale go? 0.5=middle 0.1=far on the left 0.9=far on right
-                // it will be calculated in Initialize based on the u_zoom and v_zoom. 
+                this.v_autozoom = false; // when true makes U and V same pixel size with correct v_zoom settings.
+                // Initialized to true for the NomographTypeII class
 
                 this.HTitle_pixel = 20;
                 this.HFooter_pixel = 20;
@@ -341,11 +339,6 @@
                 // Sometimes needed when debugging height issues: 
                 // height = height - 40; // a little bit of space
 
-                this.XU_pixel = 70;
-                this.XW_pixel = this.XU_pixel + (this.alpha * this.ScaleUV_pixel);
-                this.XV_pixel = this.XU_pixel + this.ScaleUV_pixel;
-                this.XRight_pixel = this.XV_pixel;
-
                 if (this.v_autozoom)
                 {
                     this.v_zoom = this.vrange / this.urange;
@@ -354,18 +347,27 @@
                 let v_scale = u_scale / this.v_zoom;
                 let w_scale = 0.5;
 
-                let make_type_II = u_scale != v_scale;
-                //make_type_II = false;
+                let make_type_II = u_scale != v_scale || this.v_autozoom;
                 if (make_type_II)
                 {
                     w_scale = (u_scale * v_scale) / (u_scale + v_scale);
                     this.alpha = u_scale / (u_scale + v_scale);
                 }
+                else
+                {
+                    this.alpha = 0.5;
+                }
+
+                this.XU_pixel = 70;
+                this.XW_pixel = this.XU_pixel + (this.alpha * this.ScaleUV_pixel);
+                this.XV_pixel = this.XU_pixel + this.ScaleUV_pixel;
+                this.XRight_pixel = this.XV_pixel;
+
                 //console.log(`NOTE: Initialize: II=${make_type_II} alpha=${this.alpha} scale u=${u_scale} v=${v_scale} w=${w_scale}`);
 
                 if (this.order == "UVW")
                 {
-                    const temp = this.XW_pixel;
+                    var temp = this.XW_pixel;
                     this.XW_pixel = this.XV_pixel;
                     this.XV_pixel = temp;
                     this.XRight_pixel = this.XW_pixel;
@@ -483,3 +485,12 @@
             }
 
         }
+
+        class NomographTypeII extends NomographTypeI
+        {
+            constructor(svg, umin, umax, vmin, vmax, u_tick_settings, v_tick_settings, w_tick_settings)
+            {
+                super(svg, umin, umax, vmin, vmax, u_tick_settings, v_tick_settings, w_tick_settings);
+                this.v_autozoom = true; // when true makes U and V same pixel size with correct v_zoom settings.
+            }
+        }        

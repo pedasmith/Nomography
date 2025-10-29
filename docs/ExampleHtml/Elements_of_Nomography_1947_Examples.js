@@ -67,16 +67,19 @@ const Examples = {
         "Create": MakePage_49Diagram
     },
 
+
 }
 
 
 function MakePage_30Diagram(svg)
 {
     var uTickSettings = new TickSettings();
+    uTickSettings.tick_label_delta = 1.0;
     var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_label_delta = 1.0;
     var wTickSettings = new TickSettings(uTickSettings);
     wTickSettings.tick_delta = 1.0;
-    wTickSettings.tick_label_delta = 2;
+    wTickSettings.tick_label_delta = 2.0;
 
     // U scale is 0..4 V scale is 0..6
     var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0,
@@ -88,6 +91,7 @@ function MakePage_30Diagram(svg)
 function MakePage_32TopDiagram(svg)
 {
     var uTickSettings = new TickSettings();
+    uTickSettings.tick_label_delta = 1.0;
     uTickSettings.tick_delta = 0.25;
     var vTickSettings = new TickSettings(uTickSettings);
     var wTickSettings = new TickSettings(uTickSettings);
@@ -104,9 +108,11 @@ function MakePage_32BottomDiagram(svg)
 {
     var uTickSettings = new TickSettings();
     uTickSettings.tick_delta = 0.25;
+    uTickSettings.tick_label_delta = 1.0;
     var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_delta = 0.50;
     var wTickSettings = new TickSettings(uTickSettings);
-    wTickSettings.tick_delta = 0.50;
+    wTickSettings.tick_delta = 0.25;
     wTickSettings.tick_label_alignment ="left";
 
     var nomograph = new NomographTypeI(svg, 12.0, 15.5, 24, 27.5,
@@ -159,9 +165,13 @@ function MakePage_36Diagram(svg)
 function MakePage_38Diagram(svg)
 {
     var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 0.1;
+    uTickSettings.tick_label_delta = 1.0;
     var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_delta = 0.2;
     vTickSettings.tick_label_alignment = "left";
     var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 0.1;
     wTickSettings.tick_label_alignment = "left";
 
     var nomograph = new NomographTypeI(svg, -2.0, 2.0, -4.0, 4.0,
@@ -181,15 +191,12 @@ function MakePage_45Diagram(svg)
     var uTickSettings = new TickSettings();
     uTickSettings.tick_delta = 0.1;
     uTickSettings.tick_label_delta = 1;
-    uTickSettings.tick_side = "left";
     var vTickSettings = new TickSettings(uTickSettings);
     vTickSettings.tick_delta = 0.2;
     vTickSettings.tick_label_delta = 2;
-    vTickSettings.tick_side="left+right";
     var wTickSettings = new TickSettings(uTickSettings);
     wTickSettings.tick_delta = 0.5;
     wTickSettings.tick_label_delta = 3;
-    wTickSettings.tick_side = "right";
 
     var nomograph = new NomographTypeI(svg, 0.0, 6.0, 0.0, 12,
         uTickSettings, vTickSettings, wTickSettings); 
@@ -214,9 +221,8 @@ function MakePage_47Diagram(svg)
     wTickSettings.tick_label_first = -50;
     wTickSettings.tick_side = "right";
 
-    var nomograph = new NomographTypeI(svg, -100, 200, 30, 60,
+    var nomograph = new NomographTypeII(svg, -100, 200, 30, 60,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.v_autozoom = true;
     nomograph.Initialize();
     return nomograph;
 }
@@ -234,15 +240,16 @@ function MakePage_49Diagram(svg)
     vTickSettings.tick_first = undefined;
     vTickSettings.tick_label_delta = 1;
     vTickSettings.tick_label_first = 34.0
+    vTickSettings.tick_label_alignment = "left";
+
     var wTickSettings = new TickSettings(uTickSettings);
     wTickSettings.tick_delta = 0.1;
     wTickSettings.tick_first = 43.3;
-    wTickSettings.tick_label_delta = 1;
+    wTickSettings.tick_label_delta = 2.0;
     wTickSettings.tick_label_first = 44;
 
-    var nomograph = new NomographTypeI(svg, 9.73, 18.16, 33.3, 39,
+    var nomograph = new NomographTypeII(svg, 9.73, 18.16, 33.3, 38.9,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.v_autozoom = true;
     nomograph.Initialize();
     return nomograph;
 }
