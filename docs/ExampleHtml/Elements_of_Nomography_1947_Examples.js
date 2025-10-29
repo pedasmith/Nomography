@@ -60,6 +60,13 @@ const Examples = {
         "Create": MakePage_47Diagram
     },
 
+    "page 49": {
+        "Short": "Page 49",
+        "Title": "Page 49 example nomograph type II",
+        "Details": "The scales can be, e.g., in units of 100 as long as all scales have the same units.",
+        "Create": MakePage_49Diagram
+    },
+
 }
 
 
@@ -209,7 +216,32 @@ function MakePage_47Diagram(svg)
 
     var nomograph = new NomographTypeI(svg, -100, 200, 30, 60,
         uTickSettings, vTickSettings, wTickSettings); 
-    //nomograph.v_zoom = 0.1;
+    nomograph.v_autozoom = true;
+    nomograph.Initialize();
+    return nomograph;
+}
+
+function MakePage_49Diagram(svg)
+{
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 0.2;
+    uTickSettings.tick_first = 10;
+    uTickSettings.tick_label_delta = 1;
+    uTickSettings.tick_label_first = 10;
+
+    var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_delta = 0.1;
+    vTickSettings.tick_first = undefined;
+    vTickSettings.tick_label_delta = 1;
+    vTickSettings.tick_label_first = 34.0
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 0.1;
+    wTickSettings.tick_first = 43.3;
+    wTickSettings.tick_label_delta = 1;
+    wTickSettings.tick_label_first = 44;
+
+    var nomograph = new NomographTypeI(svg, 9.73, 18.16, 33.3, 39,
+        uTickSettings, vTickSettings, wTickSettings); 
     nomograph.v_autozoom = true;
     nomograph.Initialize();
     return nomograph;

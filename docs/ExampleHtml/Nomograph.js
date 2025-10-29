@@ -9,6 +9,7 @@
 
             TickSize(y, scale)
             {
+                y = Math.round(y*1000000) / 1000000; // helps with weird round-off.
                 let tickType = 3;
                 let isInt = Math.round(y) == y;
                 let ld = scale.tick_settings.tick_label_delta / 5;
@@ -28,10 +29,10 @@
                 {
                     tickType = 3;
                 }
-                if (scale.name == "U")
-                {
-                    // console.log(`NOTE: Scale: y=${y} tick=${tickType}`);
-                }
+                //if (scale.name == "U")
+                //{
+                //    console.log(`NOTE: Scale: scale=${scale.name} y=${y} ld=${ld} tick=${tickType}`);
+                //}
                 let retval = 2;
                 switch (tickType)
                 {
@@ -49,6 +50,7 @@
                 let tickLeft = 4;
                 let tickRight = 4;
 
+                console.log(`NOTE: Ticks: scale=${scale.name} first=${scale.tick_settings.tick_first} ymax=${scale.ymax} delta=${scale.tick_settings.tick_delta}`);
                 for (let y = scale.tick_settings.tick_first; y<=scale.ymax; y+=scale.tick_settings.tick_delta)
                 {
                     const ticksize = this.TickSize(y, scale)
@@ -336,6 +338,8 @@
                 //let height= this.svg.getAttribute("height");
                 //let height= this.svg.offsetHeight;
                 let height= this.svg.getBoundingClientRect().height;
+                // Sometimes needed when debugging height issues: 
+                // height = height - 40; // a little bit of space
 
                 this.XU_pixel = 70;
                 this.XW_pixel = this.XU_pixel + (this.alpha * this.ScaleUV_pixel);
