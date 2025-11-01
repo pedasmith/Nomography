@@ -316,6 +316,25 @@
                 this.v_tick_settings = v_tick_settings;
                 this.w_tick_settings = w_tick_settings;
                 this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(svg);
+
+                this.currentValues = {
+                    valueU: this.umin,
+                    valueV: this.vmin,
+                    valueW: this.wmin,
+
+                    valueUPixel: 0,
+                    valueVPixel: 0,
+                    valueWPixel: 0,
+                };
+
+                // DOM element for our eventing system
+                this.onUWVValueChangedElement = document.createElement("div");
+            }
+
+            // Public method: use this to wire up a handler for when the U V W values change
+            AddValueChangedListener(fnc)
+            {
+                this.onUWVValueChangedElement.addEventListener("onUWVValueChanged", fnc);
             }
 
 
@@ -413,6 +432,7 @@
                 this.cursorMarkerRadius = 10;
                 this.cursorMarkerSelectedRadius = 15;
 
+
                 // All the cursor stuff!
                 let scaleRight = this.V;
                 if (this.order == "UVW") scaleRight =this.W;
@@ -424,9 +444,12 @@
                 this.cursorMarkerRight = this.U.DrawCirclePixel(this.svg, scaleRight.x_pixel, scaleRight.ybottom_pixel, 
                     this.cursorMarkerRadius, this.cursorMarker_style);
 
+                this.currentValues.valueUPixel = this.U.ybottom_pixel;
+                this.currentValues.valueVPixel = this.V.ybottom_pixel;
+
                 this.trackingMarker = null;
                 this.trackingScale = null;
-                this.trackingY = "y1";
+                this.trackingY = "y1"; // must match the SVG attribute e.g., y1 or y2
                 this.trackingArrowFunction = (evt) => 
                     { 
                         if (this.trackingMarker != null && this.trackingScale != null)
@@ -439,6 +462,9 @@
 
                             this.cursor.setAttribute(this.trackingY, ypixel);
                             this.trackingMarker.setAttribute("cy", ypixel);
+
+                            this.UpdatePixelValue(this.trackingY, ypixel);
+
                         }
                     };
                 this.mouseUpArrowFunction = (evt) => 
@@ -482,6 +508,44 @@
                 this.U.DrawGraduations();
                 this.V.DrawGraduations();
                 this.W.DrawGraduations();
+            }
+
+            GetScale(scaleName)
+            {
+                switch (scaleName)
+                {
+                    case "U": return this.U;
+                    case "V": return this.V;
+                    case "W": return this.W;
+                }
+            }
+
+            UpdatePixelValue(mouseName, valuePixel)
+            {
+                let scaleName = "U";
+                if (mouseName == "y2") scaleName="V"; // TODO: handle UVW
+                const scale = this.GetScale(scaleName);
+                const value = scale.PixelToY(valuePixel);
+
+                this.currentValues["value" + scaleName + "Pixel"] = valuePixel;
+                this.currentValues["value" + scaleName + ""] = value;
+
+                // Update the W value
+                // Later: actually, this should be simpler: the underlying equation is U+V=W. Since I have the U and
+                // V values, I can just add them and get the W value. All this fancy trig is a waste of time and
+                // processor power.
+                const uvDeltaYPixel = this.currentValues.valueUPixel - this.currentValues.valueVPixel;
+                this.currentValues.valueWPixel = this.currentValues.valueUPixel - (uvDeltaYPixel * this.alpha);
+                this.currentValues.valueW = this.W.PixelToY(this.currentValues.valueWPixel);
+
+                // Dispatch the change(scale + "W");
+                const uwvChanged = new CustomEvent("onUWVValueChanged", {
+                detail: {
+                    change: scale+"W", // W is always updated :-)
+                    current: this.currentValues,
+                },
+                });
+                this.onUWVValueChangedElement.dispatchEvent(uwvChanged)
             }
 
         }

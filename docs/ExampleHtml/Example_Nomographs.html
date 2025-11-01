@@ -6,13 +6,28 @@
     <script src="Nomograph.js" ></script>
     <script src="Elements_of_Nomography_1947_Examples.js" ></script>
     <script>
+        let nomograph = null;
+
+        function qround(y) { return Math.round(y*10) / 10; }
         function OnExampleChanged(value)
         {
             var item = Examples[value];
             document.getElementById("uiHeader").innerText = item.Title;
             document.getElementById("uiDetails").innerText = item.Details;
             let svg = document.getElementById("nomo");
-            item.Create(svg);
+            nomograph = item.Create(svg);
+
+            nomograph.AddValueChangedListener((event) => 
+            {
+                const change = event.detail.change;
+                const current = event.detail.current;
+                //console.log(`NOTE: delta: U=${qround(current.valueU)} V=${qround(current.valueV)} W=${qround(current.valueW)} Pixel U=${qround(current.valueUPixel)} V=${qround(current.valueVPixel)} W=${qround(current.valueWPixel)}` );
+
+                document.getElementById("uiValueU").innerText = qround(current.valueU);
+                document.getElementById("uiValueV").innerText = qround(current.valueV);
+                document.getElementById("uiValueW").innerText = qround(current.valueW);
+
+            });
         }
         function OnBodyLoad()
         {
@@ -25,6 +40,8 @@
             }
             s.value = lastkey;
             s.dispatchEvent(new Event("change"));
+
+            // Connect up the uiValues
         }        
     </script>
 </head>
@@ -44,6 +61,11 @@
                 <input id="idMin" value="5">
             </form>
         -->
+            <div id="uiValues">
+                U=<span id="uiValueU"></span>
+                V=<span id="uiValueV"></span>
+                W=<span id="uiValueW"></span>
+            </div>
             <form>
                 <label for="uiExample">Pick a Nomograph to create</label>
                 <select id="uiExample" onchange="OnExampleChanged(this.value)">
