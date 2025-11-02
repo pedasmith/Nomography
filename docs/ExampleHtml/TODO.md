@@ -28,11 +28,13 @@ See [Edge](https://blogs.windows.com/msedgedev/2024/07/11/seamless-svg-copy-past
 
 ## Fancy Web Elements
 
-### IP: Touch APIs
+### Done: 2025-11-01: Touch APIs
 
 The simple version of the SVG control has a problem: it doesn't work with touch! The ideal case here is that the user can just poke their finger on the blue circles and then move the line up and down.
 
+As it turns out, there are new touch events, and I have to tap into those (2025-11-01). The touchstart events are added just like the mousedown events were, with some slight changes. The move function was updated to work with either mouse or touch.
 
+And it works with the pen, too!
 
 
 ### IP: The web page can be an "application"
@@ -41,14 +43,16 @@ Handy links:
 * See [making PWA installable](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable
 )* [Blog about application titles](https://blogs.windows.com/msedgedev/2025/02/05/control-your-installed-web-application-title/)   <meta name="application-title">
 * See  [manifest](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/manifest)
-
-
+* [Store link](https://learn.microsoft.com/en-us/microsoft-edge/progressive-web-apps/how-to/microsoft-store)
+* [PWABUILDER](https://pwabuilder.com)
 
 Changes needed:
 * Added manifest.webmanifest (originally .json but it popped up as a potential issues in F12)
 
 
 ### Fixing all of the "issues"
+
+Status as of 2025-11-01: no issues show up in the tracker.
 
 #### LANG attribute
 

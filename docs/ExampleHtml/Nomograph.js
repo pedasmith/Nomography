@@ -456,9 +456,11 @@
                         {
                             // Move the marker + cursor!
                             let rect = this.svg.getBoundingClientRect();
-                            let ypixel = evt.y - rect.top;
+                            // handles both touch and mouse values
+                            let yraw = evt.changedTouches ? evt.changedTouches[0].clientY : evt.clientY;
+                            let ypixel = yraw - rect.top;
                             let y = this.trackingScale.PixelToY(ypixel);
-                            //console.log(`MOUSE: tracking ypixel=${ypixel} y=${y}`);
+                            //console.log(`MOUSE: tracking ypixel=${ypixel} y=${y} yraw=${yraw}`);
 
                             this.cursor.setAttribute(this.trackingY, ypixel);
                             this.trackingMarker.setAttribute("cy", ypixel);
@@ -475,6 +477,18 @@
                         this.trackingMarker.setAttribute("r", this.cursorMarkerRadius);
                         this.svg.removeEventListener("mousemove", this.trackingArrowFunction);
                         this.svg.removeEventListener("mouseup", this.mouseUpArrowFunction);
+                        this.trackingMarker = null;
+                        this.trackingScale = null;
+                    };
+
+                this.touchEndArrowFunction = (evt) => 
+                    { 
+                        // console.log(`MOUSE: Touch End x=${evt.changedTouches[0].clientX}`)
+
+                        evt.preventDefault();
+                        this.trackingMarker.setAttribute("r", this.cursorMarkerRadius);
+                        this.svg.removeEventListener("touchmove", this.trackingArrowFunction);
+                        this.svg.removeEventListener("touchend", this.mouseUpArrowFunction);
                         this.trackingMarker = null;
                         this.trackingScale = null;
                     };
@@ -503,6 +517,33 @@
                     this.svg.addEventListener("mouseup", this.mouseUpArrowFunction);
                     //console.log(`MOUSE: mousedown on ${this.trackingMarker}`)
                 });
+
+                this.cursorMarkerLeft.addEventListener("touchstart", (evt) => {
+                    this.trackingScale = this.U;
+                    this.trackingY = "y1";
+
+                    evt.preventDefault();
+                    this.trackingMarker = evt.currentTarget;
+                    this.trackingMarker.setAttribute("r", this.cursorMarkerSelectedRadius);
+                    this.svg.addEventListener("touchmove", this.trackingArrowFunction);
+                    this.svg.addEventListener("touchend", this.touchEndArrowFunction);
+                    // console.log(`MOUSE: touchdown on ${this.trackingMarker}`)
+                });                
+
+
+                this.cursorMarkerRight.addEventListener("touchstart", (evt) => {
+                    this.trackingScale = this.V;
+                    this.trackingY = "y2";
+
+                    evt.preventDefault();
+                    this.trackingMarker = evt.currentTarget;
+                    this.trackingMarker.setAttribute("r", this.cursorMarkerSelectedRadius);
+                    this.svg.addEventListener("touchmove", this.trackingArrowFunction);
+                    this.svg.addEventListener("touchend", this.touchEndArrowFunction);
+                    // console.log(`MOUSE: touchstart on ${this.trackingMarker}`)
+                });
+
+
 
                 // At the very end, draw the nomograph
                 this.U.DrawGraduations();
