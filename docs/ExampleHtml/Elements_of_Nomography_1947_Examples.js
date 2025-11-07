@@ -67,6 +67,13 @@ const Examples = {
         "Create": MakePage_49Diagram
     },
 
+    "page 53": {
+        "Short": "Page 53",
+        "Title": "Page 53 example nomograph with PQR scales",
+        "Details": "Demonstrating scale substitution",
+        "Create": MakePage_53Diagram
+    },
+
 
 }
 
@@ -254,3 +261,28 @@ function MakePage_49Diagram(svg)
     return nomograph;
 }
 
+
+function MakePage_53Diagram(svg)
+{
+    // P + 3Q = R-4
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_delta = 0.1;
+    uTickSettings.tick_label_delta = 1;
+
+    var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_delta = 0.1;
+    vTickSettings.tick_label_alignment = "left";
+
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.tick_delta = 0.5;
+    wTickSettings.tick_label_delta = 1.0;
+    wTickSettings.tick_label_first = 5.0;
+
+    var nomograph = new NomographTypeII(svg, 0.0, 6.0, 0.0, 4.0,
+        uTickSettings, vTickSettings, wTickSettings); 
+    nomograph.label = "P + 3Q = R-4";
+
+    // A PQR diagram
+    nomograph.Initialize();
+    return nomograph;
+}
