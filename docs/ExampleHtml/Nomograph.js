@@ -76,14 +76,19 @@ class NomographTypeI
     get vrange() { return this.vmax - this.vmin;} 
 
 
+    // childScaleName is e.g., "U" for P scale overlaying U scale.
+    MakeScaleOverlay(childScaleName)
+    {
+        const scale = this.GetScale(childScaleName);
+        const overlay = new ScaleOverlay(scale, null);
+        return overlay;
+    }
+
     Initialize()
     {
-        //let bbox = this.svg.getBBox(); // Nope; this is the height after all the objects are placed
-        //let height= this.svg.getAttribute("height");
-        //let height= this.svg.offsetHeight;
+        // Bad ways to get height include this.svg.getBBox (height after all objects placed), 
+        // svg.getAttribute("height") and svg.offsetHeight (may be 0).
         let height= this.svg.getBoundingClientRect().height;
-        // Sometimes needed when debugging height issues: 
-        // height = height - 40; // a little bit of space
 
         if (this.v_autozoom)
         {
@@ -142,12 +147,21 @@ class NomographTypeI
             "U", "left", this.u_tick_settings); 
         if ("U_direction" in this) this.U.direction = this.U_direction;
 
+        this.fakeU = new Scale(this.svg, "PPP",
+            this.XU_pixel, 
+            this.HTitle_pixel, h_per_unit*(this.umax-this.umin) * u_scale, 
+            0, 1, 
+            "PPP", "left", this.u_tick_settings); 
+        
+        this.P = new ScaleOverlay(this.U, this.fakeU); // TODO: fakeu is just for debugging
+
         this.V = new Scale (this.svg, "V", 
             this.XV_pixel, 
             this.HTitle_pixel, h_per_unit*(this.vmax-this.vmin)  * v_scale, 
             this.vmin, this.vmax, 
             "V", "right", this.v_tick_settings); 
         if ("V_direction" in this) this.V.direction = this.V_direction;
+        this.Q = new ScaleOverlay(this.V, null);
 
         this.W = new Scale (this.svg, "W", 
             this.XW_pixel, 
@@ -155,6 +169,7 @@ class NomographTypeI
             this.wmin, this.wmax, 
             "W", "right", this.w_tick_settings); 
         if ("W_direction" in this) this.W.direction = this.W_direction;
+        this.R = new ScaleOverlay(this.W, null);
 
         this.cursor_style = "stroke:blue; fill:none; stroke-width:4px"; 
         this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";
@@ -275,9 +290,9 @@ class NomographTypeI
 
 
         // At the very end, draw the nomograph
-        this.U.DrawGraduations();
-        this.V.DrawGraduations();
-        this.W.DrawGraduations();
+        this.P.DrawGraduations();
+        this.Q.DrawGraduations();
+        this.R.DrawGraduations();
         if (this.label != "")
         {
             this.label_ypixel = height - this.HLabel_pixel;
@@ -306,6 +321,29 @@ class NomographTypeI
             case "U": return this.U;
             case "V": return this.V;
             case "W": return this.W;
+
+            case "P": return this.P;
+            case "Q": return this.Q;
+            case "R": return this.R;
+        }
+    }
+    GetScaleOverlay(scaleName)
+    {
+        switch (scaleName)
+        {
+            case "U": return this.P;
+            case "V": return this.Q;
+            case "W": return this.R;
+        }
+    }
+
+    GetScaleOverlayName(scaleName)
+    {
+        switch (scaleName)
+        {
+            case "U": return "P";
+            case "V": return "Q";
+            case "W": return "R";
         }
     }
 
@@ -315,6 +353,10 @@ class NomographTypeI
         if (mouseName == "y2") scaleName="V"; // TODO: handle UVW
         const scale = this.GetScale(scaleName);
         const value = scale.PixelToY(valuePixel);
+
+        const scaleOverlayName = this.GetScaleOverlayName(scaleName);
+        const scaleOverlay = this.GetScaleOverlay(scaleName);
+        const valueOverlay = scaleOverlay.PixelToYOverlay(valuePixel);
 
         this.currentValues["value" + scaleName + "Pixel"] = valuePixel;
         this.currentValues["value" + scaleName + ""] = value;

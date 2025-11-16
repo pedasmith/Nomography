@@ -167,3 +167,32 @@ class Scale
         this.ticks.DrawTicks(this);
     }            
 }
+
+// As a P, Q, R scale, this class can draw ticks and convert between y values and pixel values. 
+// The childScale is the actual arithmetic scale (U, V, W) that the calculations will use.
+// The thisScale is the scale (P, Q, R) that the ticks and labels will be drawn for.
+class ScaleOverlay
+{
+    constructor (childScale, overlayScale)
+    {
+        this.childScale = childScale;
+        this.overlayScale = overlayScale;
+    }
+
+    DrawGraduations ()
+    {
+        if (this.overlayScale != null)
+        {
+            ;
+        }
+        const scale = this.overlayScale != null ? this.overlayScale : this.childScale;
+        scale.DrawGraduations();
+    }  
+
+    PixelToYOverlay(ypixel)
+    {
+        const scale = this.overlayScale != null ? this.overlayScale : this.childScale;
+        const retval = scale.PixelToY(ypixel);
+        return retval;
+    }
+}
