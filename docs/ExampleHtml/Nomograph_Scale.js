@@ -173,10 +173,38 @@ class Scale
 // The thisScale is the scale (P, Q, R) that the ticks and labels will be drawn for.
 class ScaleOverlay
 {
-    constructor (childScale, overlayScale)
+    constructor (childScale, overlayScaleSettings)
     {
+        if (overlayScaleSettings == null)
+        {
+            overlayScaleSettings = {
+                "name": childScale.name,
+                "title": childScale.title,
+                "ymin": childScale.ymin, 
+                "ymax": childScale.ymax, 
+                "toUnderlyingValue": function(value) { return value; }, 
+                "toOverlayValue" : function(value) { return value; }
+            };
+        }
+        // TODO: just make up a function that does a linear conversion?
         this.childScale = childScale;
+        const overlayScale = new Scale(childScale.svg, 
+            overlayScaleSettings.name, 
+            childScale.x_pixel,
+            childScale.ystart_pixel,
+            childScale.height_pixel,
+            overlayScaleSettings.ymin,
+            overlayScaleSettings.ymax,
+            overlayScaleSettings.title,
+            childScale.default_label_alignment,
+            childScale.tick_settings
+
+        );
         this.overlayScale = overlayScale;
+        this.toOverlayValue = overlayScaleSettings.toOverlayValue;;
+        this.toUnderlyingValue = overlayScaleSettings.toUnderlyingValue;
+
+
     }
 
     DrawGraduations ()

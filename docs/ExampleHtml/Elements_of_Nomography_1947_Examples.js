@@ -275,14 +275,43 @@ function MakePage_53Diagram(svg)
 
     var wTickSettings = new TickSettings(uTickSettings);
     wTickSettings.tick_delta = 0.5;
-    wTickSettings.tick_label_delta = 1.0;
+    wTickSettings.tick_label_delta = 5.0;
     wTickSettings.tick_label_first = 5.0;
+    wTickSettings.tick_first = 4.0; // TODO: should happen automatically! Nomograph_ticj.js Update() method
 
     var nomograph = new NomographTypeII(svg, 0.0, 6.0, 0.0, 4.0,
         uTickSettings, vTickSettings, wTickSettings); 
     nomograph.label = "P + 3Q = R-4";
 
+    const pScaleSettings = {
+        "name": "Pname",
+        "title": "P",
+        "toUnderlyingValue": function(value) { return value; }, 
+        "toOverlayValue" : function(value) { return value; }
+    };
+    nomograph.SetOverlayScaleSettings("P", pScaleSettings);
+
+    const qScaleSettings = {
+        "name": "Qname",
+        "title": "Q",
+        "toUnderlyingValue": function(value) { return value*3; }, 
+        "toOverlayValue" : function(value) { return value/3; }
+    };
+    nomograph.SetOverlayScaleSettings("Q", qScaleSettings);
+
+    const rScaleSettings = {
+        "name": "Rname",
+        "title": "R",
+        "ymin": 4.0, 
+        "ymax": 22.0, 
+        "toUnderlyingValue": function(value) { return value-4; }, 
+        "toOverlayValue" : function(value) { return value+4; }
+    };
+    nomograph.SetOverlayScaleSettings("R", rScaleSettings);
+
     // A PQR diagram
     nomograph.Initialize();
     return nomograph;
 }
+
+

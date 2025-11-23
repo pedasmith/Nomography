@@ -19,8 +19,6 @@ class NomographTypeI
         this.umax = umax;
         this.vmin = vmin;
         this.vmax = vmax;
-        this.wmin = this.umin + this.vmin;
-        this.wmax = this.umax + this.vmax;
 
         // Values used to make a type II nomograph
         this.v_zoom = 1.0;
@@ -72,16 +70,34 @@ class NomographTypeI
         this.Initialize();
     }
 
+    get wmin() { return this.umin + this.vmin;} 
+    get wmax() { return this.umax + this.vmax;}
     get urange() { return this.umax - this.umin;} 
     get vrange() { return this.vmax - this.vmin;} 
 
 
     // childScaleName is e.g., "U" for P scale overlaying U scale.
-    MakeScaleOverlay(childScaleName)
+    SetOverlayScaleSettings(childScaleName, scaleSettings)
     {
-        const scale = this.GetScale(childScaleName);
-        const overlay = new ScaleOverlay(scale, null);
-        return overlay;
+        switch (childScaleName)
+        {
+            case "P": 
+                scaleSettings.ymin = this.umin;
+                scaleSettings.ymax = this.umax;
+                this.umin = scaleSettings.toUnderlyingValue(scaleSettings.ymin);
+                this.umax = scaleSettings.toUnderlyingValue(scaleSettings.ymax);
+                this.pOverlayScaleSettings = scaleSettings; 
+                break;
+            case "Q": 
+                scaleSettings.ymin = this.vmin;
+                scaleSettings.ymax = this.vmax;
+                this.vmin = scaleSettings.toUnderlyingValue(scaleSettings.ymin);
+                this.vmax = scaleSettings.toUnderlyingValue(scaleSettings.ymax);
+                this.qOverlayScaleSettings = scaleSettings; 
+                break;
+            case "R": this.rOverlayScaleSettings = scaleSettings; break;
+
+        }
     }
 
     Initialize()
@@ -101,6 +117,7 @@ class NomographTypeI
         let make_type_II = u_scale != v_scale || this.v_autozoom;
         if (make_type_II)
         {
+            console.log(`DBG: urange=${this.urange} vrange=${this.vrange} u_scale=${u_scale} v_scale=${v_scale} v_zoom=${this.v_zoom}`);
             w_scale = (u_scale * v_scale) / (u_scale + v_scale);
             this.alpha = u_scale / (u_scale + v_scale);
         }
@@ -118,7 +135,7 @@ class NomographTypeI
 
         //console.log(`NOTE: Initialize: II=${make_type_II} alpha=${this.alpha} scale u=${u_scale} v=${v_scale} w=${w_scale}`);
 
-        if (this.order == "UVW")
+        if (this.order == "UVW") // a normal nomograph has W in the middle (UWV).
         {
             var temp = this.XW_pixel;
             this.XW_pixel = this.XV_pixel;
@@ -146,14 +163,7 @@ class NomographTypeI
             this.umin, this.umax, 
             "U", "left", this.u_tick_settings); 
         if ("U_direction" in this) this.U.direction = this.U_direction;
-
-        this.fakeU = new Scale(this.svg, "PPP",
-            this.XU_pixel, 
-            this.HTitle_pixel, h_per_unit*(this.umax-this.umin) * u_scale, 
-            0, 1, 
-            "PPP", "left", this.u_tick_settings); 
-        
-        this.P = new ScaleOverlay(this.U, this.fakeU); // TODO: fakeu is just for debugging
+        this.P = new ScaleOverlay(this.U, this.pOverlayScaleSettings); // works even when null
 
         this.V = new Scale (this.svg, "V", 
             this.XV_pixel, 
@@ -161,15 +171,16 @@ class NomographTypeI
             this.vmin, this.vmax, 
             "V", "right", this.v_tick_settings); 
         if ("V_direction" in this) this.V.direction = this.V_direction;
-        this.Q = new ScaleOverlay(this.V, null);
+        this.Q = new ScaleOverlay(this.V, this.qOverlayScaleSettings); // works even when null
 
         this.W = new Scale (this.svg, "W", 
             this.XW_pixel, 
             this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) * w_scale, 
             this.wmin, this.wmax, 
             "W", "right", this.w_tick_settings); 
+        console.log(`DBG:  U min=${this.umin} V min=${this.vmin} W min=${this.wmin} max=${this.wmax} h_per_unit=${h_per_unit} scale=${w_scale}`);
         if ("W_direction" in this) this.W.direction = this.W_direction;
-        this.R = new ScaleOverlay(this.W, null);
+        this.R = new ScaleOverlay(this.W, this.rOverlayScaleSettings); // works even when null
 
         this.cursor_style = "stroke:blue; fill:none; stroke-width:4px"; 
         this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";
@@ -192,7 +203,7 @@ class NomographTypeI
         this.currentValues.valueVPixel = this.V.ybottom_pixel;
 
         this.trackingMarker = null;
-        this.trackingScale = null;
+        this.trackingScale = null; // just for debugging
         this.trackingY = "y1"; // must match the SVG attribute e.g., y1 or y2
         this.trackingArrowFunction = (evt) => 
             { 
@@ -203,7 +214,7 @@ class NomographTypeI
                     // handles both touch and mouse values
                     let yraw = evt.changedTouches ? evt.changedTouches[0].clientY : evt.clientY;
                     let ypixel = yraw - rect.top;
-                    let y = this.trackingScale.PixelToY(ypixel);
+                    //let y = this.trackingScale.PixelToYOverlay(ypixel);
                     //console.log(`MOUSE: tracking ypixel=${ypixel} y=${y} yraw=${yraw}`);
 
                     this.cursor.setAttribute(this.trackingY, ypixel);
@@ -368,6 +379,10 @@ class NomographTypeI
         const uvDeltaYPixel = this.currentValues.valueUPixel - this.currentValues.valueVPixel;
         this.currentValues.valueWPixel = this.currentValues.valueUPixel - (uvDeltaYPixel * this.alpha);
         this.currentValues.valueW = this.W.PixelToY(this.currentValues.valueWPixel);
+
+        this.currentValues.valueP = this.P.toOverlayValue(this.currentValues.valueU);
+        this.currentValues.valueQ = this.Q.toOverlayValue(this.currentValues.valueV);
+        this.currentValues.valueR = this.R.toOverlayValue(this.currentValues.valueW);
 
         // Dispatch the change(scale + "W");
         const uwvChanged = new CustomEvent("onUWVValueChanged", {
