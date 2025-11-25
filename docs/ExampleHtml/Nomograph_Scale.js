@@ -114,21 +114,25 @@ class Scale
     }
 
 
-    DrawText(parent, str, tick_label_alignment, x, y, style)
+    DrawText(parent, str, tick_label_alignment, x, y, style, name)
     {
-        //console.log(`DrawText: called: str=<<${str}>> alignment=${tick_label_alignment} x=${x}`);
         let x_pixel = x;
         let y_pixel = this.YToPixel(y);
+
+        if (false && name == "V")
+        {
+            console.log(`DrawText: called: name=${name} y=${y} y_pixel=${y_pixel} min=${this.ymin}  max=${this.ymax} dir=${this.direction} str=<<${str}>> alignment=${tick_label_alignment} x=${x}`);
+        }
 
         const text = document.createElementNS(this.svgns, "text");
         if (tick_label_alignment == "left")
         {
-            text.setAttribute("x", x_pixel-8);
+            text.setAttribute("x", x_pixel-12);
             text.setAttribute("text-anchor", "end");
         }
         else
         {
-            text.setAttribute("x", x_pixel+6);
+            text.setAttribute("x", x_pixel+10);
             text.setAttribute("text-anchor", "start");
         }
         // small vertical adjustment so number centers on the tick
@@ -175,8 +179,10 @@ class ScaleOverlay
 {
     constructor (childScale, overlayScaleSettings)
     {
+        let settings_provided = true;
         if (overlayScaleSettings == null)
         {
+            settings_provided = false;
             overlayScaleSettings = {
                 "name": childScale.name,
                 "title": childScale.title,
@@ -187,8 +193,10 @@ class ScaleOverlay
             };
         }
         // TODO: just make up a function that does a linear conversion?
+        // HUH? why am I always making an overlay scale? Why not just use the child scale directly?
+        // 
         this.childScale = childScale;
-        const overlayScale = new Scale(childScale.svg, 
+        let overlayScale = new Scale(childScale.svg, 
             overlayScaleSettings.name, 
             childScale.x_pixel,
             childScale.ystart_pixel,
@@ -198,13 +206,14 @@ class ScaleOverlay
             overlayScaleSettings.title,
             childScale.default_label_alignment,
             childScale.tick_settings
-
         );
-        this.overlayScale = overlayScale;
+        overlayScale.direction = childScale.direction;
+
+        this.overlayScaleDefault = overlayScale;
+        if (settings_provided) this.overlayScale = overlayScale;
+
         this.toOverlayValue = overlayScaleSettings.toOverlayValue;;
         this.toUnderlyingValue = overlayScaleSettings.toUnderlyingValue;
-
-
     }
 
     DrawGraduations ()

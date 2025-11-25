@@ -3,10 +3,10 @@
 // Requires Nomograph_Ticks.js Nomograph_Scale.js
 
 
-
-
 class NomographTypeI
 {
+    ValidationInfo = undefined;
+
     constructor(svg, umin, umax, vmin, vmax, u_tick_settings, v_tick_settings, w_tick_settings)
     {
         this.label_textstyle = ""; // tick_textstyle from Scale: "font-family:Courier New, monospace;white-space: pre;";
@@ -70,8 +70,10 @@ class NomographTypeI
         this.Initialize();
     }
 
-    get wmin() { return this.umin + this.vmin;} 
-    get wmax() { return this.umax + this.vmax;}
+
+
+    get wmin() { return this.wmin_override ?? this.umin + this.vmin;} 
+    get wmax() { return this.wmax_override ?? this.umax + this.vmax;}
     get urange() { return this.umax - this.umin;} 
     get vrange() { return this.vmax - this.vmin;} 
 
@@ -95,8 +97,9 @@ class NomographTypeI
                 this.vmax = scaleSettings.toUnderlyingValue(scaleSettings.ymax);
                 this.qOverlayScaleSettings = scaleSettings; 
                 break;
-            case "R": this.rOverlayScaleSettings = scaleSettings; break;
-
+            case "R": 
+                this.rOverlayScaleSettings = scaleSettings; 
+                break;
         }
     }
 
@@ -117,7 +120,6 @@ class NomographTypeI
         let make_type_II = u_scale != v_scale || this.v_autozoom;
         if (make_type_II)
         {
-            console.log(`DBG: urange=${this.urange} vrange=${this.vrange} u_scale=${u_scale} v_scale=${v_scale} v_zoom=${this.v_zoom}`);
             w_scale = (u_scale * v_scale) / (u_scale + v_scale);
             this.alpha = u_scale / (u_scale + v_scale);
         }
@@ -137,17 +139,17 @@ class NomographTypeI
 
         if (this.order == "UVW") // a normal nomograph has W in the middle (UWV).
         {
-            var temp = this.XW_pixel;
+            let new_xv = this.XW_pixel;
             this.XW_pixel = this.XV_pixel;
-            this.XV_pixel = temp;
+            this.XV_pixel = new_xv;
             this.XRight_pixel = this.XW_pixel;
 
             this.V_direction = "down";
             this.W_direction = "down";
 
-            temp = v_scale;
+            let new_wscale = v_scale;
             v_scale = w_scale;
-            w_scale = temp;
+            w_scale = new_wscale;
         }
 
         let h_pixel = height - this.HTitle_pixel - this.HFooter_pixel - this.HLabel_pixel;
@@ -178,7 +180,6 @@ class NomographTypeI
             this.HTitle_pixel, h_per_unit*(this.wmax-this.wmin) * w_scale, 
             this.wmin, this.wmax, 
             "W", "right", this.w_tick_settings); 
-        console.log(`DBG:  U min=${this.umin} V min=${this.vmin} W min=${this.wmin} max=${this.wmax} h_per_unit=${h_per_unit} scale=${w_scale}`);
         if ("W_direction" in this) this.W.direction = this.W_direction;
         this.R = new ScaleOverlay(this.W, this.rOverlayScaleSettings); // works even when null
 
@@ -186,7 +187,6 @@ class NomographTypeI
         this.cursorMarker_style = "stroke:blue; fill:blue; fill-opacity:50%; stroke-width:1px";
         this.cursorMarkerRadius = 10;
         this.cursorMarkerSelectedRadius = 15;
-
 
         // All the cursor stuff!
         let scaleRight = this.V;
@@ -299,7 +299,6 @@ class NomographTypeI
         });
 
 
-
         // At the very end, draw the nomograph
         this.P.DrawGraduations();
         this.Q.DrawGraduations();
@@ -308,6 +307,11 @@ class NomographTypeI
         {
             this.label_ypixel = height - this.HLabel_pixel;
             this.DrawLabelPixel(this.svg, this.label, this.XCenter_pixel, this.label_ypixel + 10);
+        }
+
+        if (this.ValidationInfo != undefined)
+        {
+            console.log(`Validation Info: ${this.ValidationInfo}`);
         }
     }
 
