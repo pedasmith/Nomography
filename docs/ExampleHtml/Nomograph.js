@@ -78,26 +78,35 @@ class NomographTypeI
     get vrange() { return this.vmax - this.vmin;} 
 
 
-    // childScaleName is e.g., "U" for P scale overlaying U scale.
+    // childScaleName is e.g., "U" for P scale overlaying U scale. The required elements of the scaleSettings
+    // are the toUnderlyingValue and toOverlayValue functions. Optionally, ymin and ymax can be provided.
+    // (the ymin and ymax are required for R scales)
     SetOverlayScaleSettings(childScaleName, scaleSettings)
     {
+        scaleSettings.name = scaleSettings.name ?? childScaleName;
+        scaleSettings.title = scaleSettings.title ?? scaleSettings.name;
+
         switch (childScaleName)
         {
             case "P": 
-                scaleSettings.ymin = this.umin;
-                scaleSettings.ymax = this.umax;
+                scaleSettings.ymin = scaleSettings.ymin ?? this.umin;
+                scaleSettings.ymax = scaleSettings.ymax ?? this.umax;
                 this.umin = scaleSettings.toUnderlyingValue(scaleSettings.ymin);
                 this.umax = scaleSettings.toUnderlyingValue(scaleSettings.ymax);
                 this.pOverlayScaleSettings = scaleSettings; 
                 break;
             case "Q": 
-                scaleSettings.ymin = this.vmin;
-                scaleSettings.ymax = this.vmax;
+                scaleSettings.ymin = scaleSettings.ymin ?? this.vmin;
+                scaleSettings.ymax = scaleSettings.ymax ?? this.vmax;
                 this.vmin = scaleSettings.toUnderlyingValue(scaleSettings.ymin);
                 this.vmax = scaleSettings.toUnderlyingValue(scaleSettings.ymax);
                 this.qOverlayScaleSettings = scaleSettings; 
                 break;
             case "R": 
+                scaleSettings.ymin = scaleSettings.ymin ?? (scaleSettings.toOverlayValue(this.umin + this.vmin));
+                scaleSettings.ymax = scaleSettings.ymax ?? (scaleSettings.toOverlayValue(this.umax + this.vmax));
+                this.wmin_override = scaleSettings.toUnderlyingValue(scaleSettings.ymin);
+                this.wmax_override = scaleSettings.toUnderlyingValue(scaleSettings.ymax);
                 this.rOverlayScaleSettings = scaleSettings; 
                 break;
         }

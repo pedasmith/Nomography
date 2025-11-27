@@ -70,7 +70,7 @@ const Examples = {
     "page 53": {
         "Short": "Page 53",
         "Title": "Page 53 example nomograph with PQR scales",
-        "Details": "Demonstrating scale substitution",
+        "Details": "Demonstrating scale substitution. Instead of a linear U+V=W, instead there's a P + 3Q = R-4 relationship. The P, Q, and R scales are overlays on the U, V, and W scales respectively.",
         "Create": MakePage_53Diagram
     },
 
@@ -276,40 +276,29 @@ function MakePage_53Diagram(svg)
     wTickSettings.tick_label_delta = 5.0;
     wTickSettings.tick_label_first = 5.0;
     wTickSettings.tick_label_alignment = "left";
-    wTickSettings.tick_first = 4.0; // TODO: should happen automatically! Nomograph_ticj.js Update() method
+    wTickSettings.tick_first = 4.0; // TODO: should happen automatically! Nomograph_tick.js Update() method
+    // The problem is that tick_first is set too early
 
     var nomograph = new NomographTypeII(svg, 0.0, 6.0, 0.0, 4.0,
         uTickSettings, vTickSettings, wTickSettings); 
     nomograph.ValidationInfo = "P: 5..6 with 1 medium 8 small; R: 15..20 with 4 medium 5 small; Q: 3..4 with 1 medium 8 small";
     nomograph.label = "P + 3Q = R-4";
 
-    const pScaleSettings = {
-        "name": "P",
-        "title": "P",
+    nomograph.SetOverlayScaleSettings("P", {
         "toUnderlyingValue": function(value) { return value; }, 
         "toOverlayValue" : function(value) { return value; }
-    };
-    nomograph.SetOverlayScaleSettings("P", pScaleSettings);
+    });
 
-    const qScaleSettings = {
-        "name": "Q",
-        "title": "Q",
+    nomograph.SetOverlayScaleSettings("Q",  {
         "toUnderlyingValue": function(value) { return value*3; }, 
         "toOverlayValue" : function(value) { return value/3; }
-    };
-    nomograph.SetOverlayScaleSettings("Q", qScaleSettings);
+    });
 
-    const rScaleSettings = {
-        "name": "R",
-        "title": "R",
-        "ymin": 4.0, 
-        "ymax": 22.0, 
+    nomograph.SetOverlayScaleSettings("R", {
         "toUnderlyingValue": function(value) { return value-4; }, 
         "toOverlayValue" : function(value) { return value+4; }
-    };
-    nomograph.SetOverlayScaleSettings("R", rScaleSettings);
+    });
 
-    // A PQR diagram
     nomograph.Initialize();
     return nomograph;
 }
