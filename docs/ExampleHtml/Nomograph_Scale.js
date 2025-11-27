@@ -12,7 +12,7 @@ class Scale
         // Some of the tick settings have a default values from the scale.
         // For example, tick_first is usually scale.ymin, but sometimes isn't.
         this.tick_settings = tick_settings;
-        this.tick_settings.Update(this, default_label_alignment);
+        this.tick_settings.UpdateTickSettings(this, default_label_alignment);
 
         this.direction = "up"; // either "up" or "down". Default is down.
 
@@ -196,6 +196,7 @@ class ScaleOverlay
         // HUH? why am I always making an overlay scale? Why not just use the child scale directly?
         // 
         this.childScale = childScale;
+        const child_tick_first = childScale.tick_settings.tick_first;
         let overlayScale = new Scale(childScale.svg, 
             overlayScaleSettings.name, 
             childScale.x_pixel,
@@ -209,7 +210,21 @@ class ScaleOverlay
         );
         overlayScale.direction = childScale.direction;
 
-        this.overlayScaleDefault = overlayScale;
+        // Special fixup: the child W scale will have a default tick_first (set to the ymin, of course). 
+        // when we make the R overlay scale, it will use the W tick_first, which is in the wrong units.
+        // Issue: the correction get applied twice :-)
+        if (childScale.name == "W" && overlayScale.name == "R")
+        {
+            if (overlayScale.tick_settings.tick_first_was_updated == undefined)
+            {
+                overlayScale.tick_settings.tick_first_was_updated = true;
+                const overlay_tick_first = overlayScaleSettings.toOverlayValue(child_tick_first);
+                overlayScale.tick_settings.tick_first = overlay_tick_first;
+                console.log(`DBG: ScaleOverlay: R tick_first adjusted from W=${child_tick_first} to R=${overlay_tick_first}`);
+            }
+        }
+
+        this.overlayScaleUnused = overlayScale;
         if (settings_provided) this.overlayScale = overlayScale;
 
         this.toOverlayValue = overlayScaleSettings.toOverlayValue;;

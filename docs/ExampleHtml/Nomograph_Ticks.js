@@ -47,7 +47,7 @@ class Ticks
 
 
     // Uses the TickSettings that are passed in from the original Nomograph constructor (and which
-    // are stored in the Scale object and have had Update() called) to draw ticks on the scale.
+    // are stored in the Scale object and have had UpdateTickSettings() called) to draw ticks on the scale.
     DrawTicks(scale)
     {
         for (let y = scale.tick_settings.tick_first; y<=(scale.ymax + 0.0000001); y+=scale.tick_settings.small_mod)
@@ -109,7 +109,7 @@ class TickSettings
     }
 
     // Fill in any undefined values from the scale defaults.
-    Update(scale, default_label_alignment)
+    UpdateTickSettings(scale, default_label_alignment)
     {
         this.small_mod = this.small_mod ?? 0.1;
         this.medium_mod = this.medium_mod ?? 0.5;

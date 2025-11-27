@@ -276,8 +276,6 @@ function MakePage_53Diagram(svg)
     wTickSettings.tick_label_delta = 5.0;
     wTickSettings.tick_label_first = 5.0;
     wTickSettings.tick_label_alignment = "left";
-    wTickSettings.tick_first = 4.0; // TODO: should happen automatically! Nomograph_tick.js Update() method
-    // The problem is that tick_first is set too early
 
     var nomograph = new NomographTypeII(svg, 0.0, 6.0, 0.0, 4.0,
         uTickSettings, vTickSettings, wTickSettings); 
