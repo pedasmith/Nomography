@@ -60,7 +60,7 @@ class Ticks
 
         for (let y = scale.tick_settings.tick_label_first; y<=scale.ymax; y+=scale.tick_settings.tick_label_delta)
         {
-            var str = y.toFixed(scale.tick_settings.tick_precision);
+            var str = y.toFixed(); // NOTE: old code was used scale.tick_settings.tick_precision); 
             // This qualifies as a code issue for Daily WTF. But it's quick and it works for now.
             str = str.replace(".0000", "     ");
             str = str.replace(".000", "    ");
@@ -82,8 +82,6 @@ class TickSettings
     constructor(optionalValue, small_mod, medium_mod, large_mod)
     {
         this.tick_first = undefined;
-        //this.tick_delta = 0.5;
-        //this.tick_precision = 1;
         this.tick_side = "left+right";
         this.tick_label_first = undefined;
         this.tick_label_delta = undefined;
@@ -92,8 +90,6 @@ class TickSettings
         if (optionalValue != undefined)
         {
             this.tick_first = optionalValue.tick_first;
-            //this.tick_delta = optionalValue.tick_delta;
-            //this.tick_precision = optionalValue.tick_precision;
             this.tick_side = optionalValue.tick_side;
             this.tick_label_first = optionalValue.tick_label_first;
             this.tick_label_delta = optionalValue.tick_label_delta;
@@ -124,7 +120,7 @@ class TickSettings
         }
         if (this.tick_label_delta == undefined)
         {
-            this.tick_label_delta = this.medium_mod; //TODO: remove: .tick_delta;
+            this.tick_label_delta = this.medium_mod;
         }
         if (this.tick_label_first == undefined)
         {
@@ -134,8 +130,6 @@ class TickSettings
         {
             this.tick_label_alignment = default_label_alignment;
         }
-
-
     }
 }
 
