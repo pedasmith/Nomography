@@ -26,8 +26,7 @@ class Scale
         this.ybottom_pixel = this.ystart_pixel + this.height_pixel;
         this.title = title;
 
-        // is handled in settings now: TODO: remove: this.tick_label_alignment = tick_label_alignment;
-        if (tick_settings.tick_label_alignment != "left" && tick_settings.tick_label_alignment != "right")
+        if (this.tick_settings.tick_label_alignment != "left" && this.tick_settings.tick_label_alignment != "right")
         {
             console.log(`Error: Scale:Ticks: tick_label_alignment is ${tick_settings.tick_label_alignment}. It must be left or right.`);
         }
@@ -209,7 +208,7 @@ class ScaleOverlay
             overlayScaleSettings.ymin,
             overlayScaleSettings.ymax,
             overlayScaleSettings.title,
-            childScale.default_label_alignment,
+            childScale.tick_settings.tick_label_alignment, 
             childScale.tick_settings_original
         );
         overlayScale.direction = childScale.direction;

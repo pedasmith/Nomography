@@ -38,7 +38,6 @@ class NomographTypeI
         this.u_tick_settings = u_tick_settings;
         this.v_tick_settings = v_tick_settings;
         this.w_tick_settings = w_tick_settings;
-        this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(svg);
 
         this.currentValues = {
             valueU: this.umin,
@@ -65,7 +64,12 @@ class NomographTypeI
 
     OnSizeChange()
     {
-        let height= this.svg.getBoundingClientRect().height;
+        let height = this.svg.getBoundingClientRect().height;
+        if (this.suppressResizeObserverCallback == true)
+        {
+            this.suppressResizeObserverCallback = false;
+            return;
+        }
         this.svg.innerHTML = "";
         this.Initialize();
     }
@@ -116,7 +120,7 @@ class NomographTypeI
     {
         // Bad ways to get height include this.svg.getBBox (height after all objects placed), 
         // svg.getAttribute("height") and svg.offsetHeight (may be 0).
-        let height= this.svg.getBoundingClientRect().height;
+        let height = this.svg.getBoundingClientRect().height;
 
         if (this.v_autozoom)
         {
@@ -322,6 +326,15 @@ class NomographTypeI
         {
             console.log(`Validation Info: ${this.ValidationInfo}`);
         }
+
+        if (this.resizeObserver_set == undefined)
+        {
+            this.resizeObserver_set = true;
+            this.suppressResizeObserverCallback = true;
+            console.log(`DBG: Initialize: setting up ResizeObserver`);
+            this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(this.svg);
+        }
+
     }
 
     DrawLabelPixel(parent, str, x, y)

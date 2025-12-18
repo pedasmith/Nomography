@@ -96,7 +96,7 @@ function MakePage_30Diagram(svg)
     // U scale is 0..4 V scale is 0..6
     var nomograph = new NomographTypeI(svg, 0.0, 4.0, 0.0, 6.0,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.ValidationInfo = "U: 3..4 with 1 medium; W 8..10 with 1 medium; V 5..6 1 medium tick";
+    nomograph.ValidationInfo = "U: 0...3..4 with 1 medium; W 0...8..10 with 1 medium; V 0...5..6 1 medium tick";
     nomograph.Initialize();
     return nomograph;
 }
@@ -113,7 +113,7 @@ function MakePage_32TopDiagram(svg)
     // U scale is -3..0.5 V scale is -2..0.5
     var nomograph = new NomographTypeI(svg, -3.0, 0.5, -2.0, 1.5,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.ValidationInfo = "U: -1..0 with 1 medium 2 small tick; W: 1..2 with 1 medium; V 0..1 with 1 medium 2 small tick";
+    nomograph.ValidationInfo = "U: -3...-1..0 with 1 medium 2 small tick; W: -5...1..2 with 1 medium; V -2...0..1 with 1 medium 2 small tick";
     nomograph.Initialize();
     return nomograph;
 }
@@ -130,7 +130,7 @@ function MakePage_32BottomDiagram(svg)
 
     var nomograph = new NomographTypeI(svg, 12.0, 15.5, 24, 27.5,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.ValidationInfo = "U: 14..15 with 1 medium 2 small; W: 42..43 with 1 medium; V: 26..27 with 1 medium 2 small";
+    nomograph.ValidationInfo = "U: 12...14..15 with 1 medium 2 small; W: 36...42..43 with 1 medium; V: 24...26..27 with 1 medium 2 small";
     nomograph.Initialize();
     return nomograph;
 }
@@ -151,7 +151,7 @@ function MakePage_34Diagram(svg)
     var nomograph = new NomographTypeI(svg, 0.0, 12.0, 0.0, 12.0,
         uTickSettings, vTickSettings, wTickSettings); 
     nomograph.Initialize();
-    nomograph.ValidationInfo = "U: 10..12 with 1 medium 2 small; W: 22..24 with 1 medium; V: 10..12 with 1 medium 2 small";
+    nomograph.ValidationInfo = "U: 0...10..12 with 1 medium 2 small; W: 0...22..24 with 1 medium; V: 0...10..12 with 1 medium 2 small";
     return nomograph;
 }
 
@@ -173,7 +173,7 @@ function MakePage_36Diagram(svg)
 
     var nomograph = new NomographTypeI(svg, -27.0, 9.0, 18.0, 54.0,
         uTickSettings, vTickSettings, wTickSettings);
-    nomograph.ValidationInfo = "U: -10..0 with 1 medium 8 small; W: 50..60 with 5 medium; V: 40..50 with 1 medium 8 small";
+    nomograph.ValidationInfo = "U: -20...-10..0 with 1 medium 8 small; W: 0...50..60 with 5 medium; V: 20...40..50 with 1 medium 8 small";
     nomograph.Initialize();
     return nomograph;
 }
@@ -190,7 +190,7 @@ function MakePage_38Diagram(svg)
 
     var nomograph = new NomographTypeI(svg, -2.0, 2.0, -4.0, 4.0,
         uTickSettings, vTickSettings, wTickSettings);
-    nomograph.ValidationInfo = "U: 1..2 with 1 medium 8 small; V: -3..-4 with 4 medium; W: -1..-2 with 1 medium 8 small";
+    nomograph.ValidationInfo = "U: -2...1..2 with 1 medium 8 small; V: 4...-3..-4 with 4 medium; W: 2...-1..-2 with 1 medium 8 small";
 
     nomograph.order = "UVW"; // allowed: UWV default or UVW
     nomograph.wmin_override = -2;
@@ -217,7 +217,7 @@ function MakePage_45Diagram(svg)
 
     var nomograph = new NomographTypeI(svg, 0.0, 6.0, 0.0, 12,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.ValidationInfo = "U: 5..6 with 1 medium 8 small; W: 15..18 with 2 medium 3 small; V: 10..12 with 1 medium 8 small";
+    nomograph.ValidationInfo = "U: 0...5..6 with 1 medium 8 small; W: 0...15..18 with 2 medium 3 small; V: 0...10..12 with 1 medium 8 small";
     nomograph.v_zoom = 2; // when the U goes up by 1, the V should go up by 2
     nomograph.Initialize();
     return nomograph;
@@ -238,7 +238,7 @@ function MakePage_47Diagram(svg)
 
     var nomograph = new NomographTypeII(svg, -100, 200, 30, 60,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.ValidationInfo = "U: 150..200 with 1 medium 8 small; W: 200..250 with 4 medium; V: 55..60 with 4 medium 5 small";
+    nomograph.ValidationInfo = "U: -100...150..200 with 1 medium 8 small; W: -50...200..250 with 4 medium; V: 30...55..60 with 4 medium 5 small";
     nomograph.Initialize();
     return nomograph;
 }
@@ -263,7 +263,7 @@ function MakePage_49Diagram(svg)
 
     var nomograph = new NomographTypeII(svg, 9.73, 18.16, 33.3, 38.9,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.ValidationInfo = "U: 17..18 with 4 medium; W 54..56 with 1 medium 8 small; V: 37..38 with 1 medium 8 small";
+    nomograph.ValidationInfo = "U: 10...17..18 with 4 medium; W 44...54..56 with 1 medium 8 small; V: 34...37..38 with 1 medium 8 small";
     nomograph.Initialize();
     return nomograph;
 }
@@ -286,7 +286,7 @@ function MakePage_53Diagram(svg)
 
     var nomograph = new NomographTypeII(svg, 0.0, 6.0, 0.0, 4.0,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.ValidationInfo = "P: 5..6 with 1 medium 8 small; R: 15..20 with 4 medium 5 small; Q: 3..4 with 1 medium 8 small";
+    nomograph.ValidationInfo = "P: 0...5..6 with 1 medium 8 small; R: 5...15..20 with 4 medium 5 small; Q: 0...3..4 with 1 medium 8 small";
     nomograph.label = "P + 3Q = R-4";
 
     nomograph.SetOverlayScaleSettings("P", {
@@ -326,7 +326,7 @@ function MakePage_56Diagram(svg)
 
     var nomograph = new NomographTypeII(svg, 2.0, 5.0, 1.0, 4.0,
         uTickSettings, vTickSettings, wTickSettings); 
-    nomograph.ValidationInfo = "P: 2...4..5 log with 1 medium 8 small; R: -4..6 every 2 with 1 medium 8 small; Q: 4..1 with 1 medium 8 small";
+    nomograph.ValidationInfo = "P: 2...4..5 log with 1 medium 8 small; R: -4...4..6 every 2 with 1 medium 8 small; Q: 4...2..1 with 1 medium 8 small";
     nomograph.label = "P² - 5Q = 3R";
 
     nomograph.SetOverlayScaleSettings("P", {
