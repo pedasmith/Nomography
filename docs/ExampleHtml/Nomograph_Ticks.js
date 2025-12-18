@@ -78,6 +78,11 @@ class TickSettings
     small_mod = undefined;
     medium_mod = undefined;
     large_mod = undefined;
+
+    clone()
+    {
+        return new TickSettings(this, this.small_mod, this.medium_mod, this.large_mod);
+    }
     
     constructor(optionalValue, small_mod, medium_mod, large_mod)
     {
@@ -99,9 +104,9 @@ class TickSettings
             this.large_mod = optionalValue.large_mod;
         }
 
-        if (small_mod != undefined) this.small_mod = small_mod;
-        if (medium_mod != undefined) this.medium_mod = medium_mod;
-        if (large_mod != undefined) this.large_mod = large_mod;
+        this.small_mod = small_mod;
+        this.medium_mod = medium_mod;
+        this.large_mod = large_mod;
     }
 
     // Fill in any undefined values from the scale defaults.

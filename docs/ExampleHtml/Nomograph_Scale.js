@@ -11,7 +11,11 @@ class Scale
 
         // Some of the tick settings have a default values from the scale.
         // For example, tick_first is usually scale.ymin, but sometimes isn't.
-        this.tick_settings = tick_settings;
+
+        // It's critical to clone the incoming settings. The incoming settings are from the user,
+        // but in the scale we will (possibly) modify them via UpdateTickSettings.
+        this.tick_settings_original = tick_settings;
+        this.tick_settings = tick_settings.clone();
         this.tick_settings.UpdateTickSettings(this, default_label_alignment);
 
         this.direction = "up"; // either "up" or "down". Default is down.
@@ -206,7 +210,7 @@ class ScaleOverlay
             overlayScaleSettings.ymax,
             overlayScaleSettings.title,
             childScale.default_label_alignment,
-            childScale.tick_settings
+            childScale.tick_settings_original
         );
         overlayScale.direction = childScale.direction;
 
@@ -220,7 +224,6 @@ class ScaleOverlay
                 overlayScale.tick_settings.tick_first_was_updated = true;
                 const overlay_tick_first = overlayScaleSettings.toOverlayValue(child_tick_first);
                 overlayScale.tick_settings.tick_first = overlay_tick_first;
-                console.log(`DBG: ScaleOverlay: R tick_first adjusted from W=${child_tick_first} to R=${overlay_tick_first}`);
             }
         }
 
@@ -237,13 +240,13 @@ class ScaleOverlay
         {
             ;
         }
-        const scale = this.overlayScale != null ? this.overlayScale : this.childScale;
+        const scale = this.overlayScale ?? this.childScale;
         scale.DrawGraduations();
     }  
 
     PixelToYOverlay(ypixel)
     {
-        const scale = this.overlayScale != null ? this.overlayScale : this.childScale;
+        const scale = this.overlayScale ?? this.childScale;
         const retval = scale.PixelToY(ypixel);
         return retval;
     }

@@ -78,7 +78,7 @@ class NomographTypeI
     get vrange() { return this.vmax - this.vmin;} 
 
 
-    // childScaleName is e.g., "U" for P scale overlaying U scale. The required elements of the scaleSettings
+    // childScaleName is e.g., "P" for P scale overlaying U scale. The required elements of the scaleSettings
     // are the toUnderlyingValue and toOverlayValue functions. Optionally, ymin and ymax can be provided.
     // (the ymin and ymax are required for R scales)
     SetOverlayScaleSettings(childScaleName, scaleSettings)

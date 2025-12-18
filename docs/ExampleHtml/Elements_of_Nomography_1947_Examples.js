@@ -74,6 +74,13 @@ const Examples = {
         "Create": MakePage_53Diagram
     },
 
+    "page 56": {
+        "Short": "Page 56",
+        "Title": "Page 56 example log-scale PQR nomograph",
+        "Details": "Demonstrating the use of log scales. The P, Q, and R scales are all shown as log scales.",
+        "Create": MakePage_56Diagram
+    },
+
 }
 
 
@@ -302,3 +309,41 @@ function MakePage_53Diagram(svg)
 }
 
 
+function MakePage_56Diagram(svg)
+{
+    // P**2 - 5Q = 3R
+    var uTickSettings = new TickSettings();
+    uTickSettings.tick_label_delta = 1;
+
+    var vTickSettings = new TickSettings(uTickSettings);
+    vTickSettings.tick_label_alignment = "left";
+
+    var wTickSettings = new TickSettings(uTickSettings);
+    wTickSettings.small_mod = 0.5;
+    wTickSettings.tick_label_delta = 5.0;
+    wTickSettings.tick_label_first = 5.0;
+    wTickSettings.tick_label_alignment = "left";
+
+    var nomograph = new NomographTypeII(svg, 2.0, 5.0, 1.0, 4.0,
+        uTickSettings, vTickSettings, wTickSettings); 
+    nomograph.ValidationInfo = "P: 2...4..5 log with 1 medium 8 small; R: -4..6 every 2 with 1 medium 8 small; Q: 4..1 with 1 medium 8 small";
+    nomograph.label = "P² - 5Q = 3R";
+
+    nomograph.SetOverlayScaleSettings("P", {
+        "toUnderlyingValue": function(value) { return value*value; }, 
+        "toOverlayValue" : function(value) { return Math.sqrt(value); }
+    });
+
+    nomograph.SetOverlayScaleSettings("Q",  {
+        "toUnderlyingValue": function(value) { return -value*5; }, 
+        "toOverlayValue" : function(value) { return -value/5; }
+    });
+
+    nomograph.SetOverlayScaleSettings("R", {
+        "toUnderlyingValue": function(value) { return value*3; }, 
+        "toOverlayValue" : function(value) { return value/3; }
+    });
+
+    nomograph.Initialize();
+    return nomograph;
+}
