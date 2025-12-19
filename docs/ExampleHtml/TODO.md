@@ -6,8 +6,6 @@ Contains exploratory code for making a variety of Nomographs. Examples are from 
 
 ## Current bug notes
 
-Lots of errors in the console
-Some graphs don't match their validation values.
 
 
 ## Simple TODO items
@@ -15,7 +13,11 @@ Some graphs don't match their validation values.
 Add UX to set the UWV values.
 Support the PQR (?) values as overlays over the UWV scales
 
-2025-12-18: Validation info is weird because it's not clear that e.g., p53 "P = 5..6 means the top two number are 5&6 and the bottom number is 0. The validation info should be "P: 0..6 top 5..6"
+DONE: 2025-12-18: all graphs match their validation values
+DONE: 2025-12-18: resize callback called too often! 
+DONE: 2025-12-18: The old nomagraphs are not cleared (but sometimes they are)?
+DONE: 2025-12-18: Lots of errors in the console
+DONE: 2025-12-18: Validation info is weird because it's not clear that e.g., p53 "P = 5..6 means the top two number are 5&6 and the bottom number is 0. The validation info should be "P: 0..6 top 5..6"
 
 DONE: 2025-11-01: Why can't I move stuff with a touch?
 DONE: 2025-11-01: Add UX boxes to see the UWV values

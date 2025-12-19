@@ -2,6 +2,7 @@
 // A Nomograph contains multiple Scales; a Scale includes a single Ticks.
 // Requires Nomograph_Ticks.js Nomograph_Scale.js
 
+GlobalResizeObserver = undefined;
 
 class NomographTypeI
 {
@@ -14,6 +15,7 @@ class NomographTypeI
         this.svgns = "http://www.w3.org/2000/svg";
 
         this.svg = svg;
+        this.svg.innerHTML = ""; // just in case there was something there before (like a different nomograph)
 
         this.umin = umin;
         this.umax = umax;
@@ -53,6 +55,17 @@ class NomographTypeI
 
         // DOM element for our eventing system
         this.onUWVValueChangedElement = document.createElement("div");
+
+        this.suppressResizeObserverCallback = true;
+        this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this));
+        this.resizeObserver.observe(this.svg);
+
+        // Must remove the previous observer (if any) when the SVG is reused.
+        if (GlobalResizeObserver != undefined)
+        {
+            GlobalResizeObserver.unobserve(this.svg);
+        }
+        GlobalResizeObserver = this.resizeObserver;
     }
 
     // Public method: use this to wire up a handler for when the U V W values change
@@ -326,15 +339,6 @@ class NomographTypeI
         {
             console.log(`Validation Info: ${this.ValidationInfo}`);
         }
-
-        if (this.resizeObserver_set == undefined)
-        {
-            this.resizeObserver_set = true;
-            this.suppressResizeObserverCallback = true;
-            console.log(`DBG: Initialize: setting up ResizeObserver`);
-            this.resizeObserver = new ResizeObserver(this.OnSizeChange.bind(this)).observe(this.svg);
-        }
-
     }
 
     DrawLabelPixel(parent, str, x, y)

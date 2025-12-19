@@ -104,9 +104,9 @@ class TickSettings
             this.large_mod = optionalValue.large_mod;
         }
 
-        this.small_mod = small_mod;
-        this.medium_mod = medium_mod;
-        this.large_mod = large_mod;
+        this.small_mod = small_mod ?? this.small_mod;
+        this.medium_mod = medium_mod ?? this.medium_mod;
+        this.large_mod = large_mod ?? this.large_mod;
     }
 
     // Fill in any undefined values from the scale defaults.

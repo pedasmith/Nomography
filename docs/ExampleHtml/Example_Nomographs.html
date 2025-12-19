@@ -20,7 +20,7 @@
             var item = Examples[value];
             document.getElementById("uiHeader").innerText = item.Title;
             document.getElementById("uiDetails").innerText = item.Details;
-            let svg = document.getElementById("nomo");
+            let svg = document.getElementById("svg_nomograph");
             nomograph = item.Create(svg);
 
             nomograph.AddValueChangedListener((event) => 
@@ -40,6 +40,7 @@
         }
         function OnBodyLoad()
         {
+            // Connect each of the example nomographs to the select box
             const s = document.getElementById("uiExample");
             var lastkey = "";
             for (const [key, value] of Object.entries(Examples)) {
@@ -49,8 +50,6 @@
             }
             s.value = lastkey;
             s.dispatchEvent(new Event("change"));
-
-            // Connect up the uiValues
         }        
     </script>
 </head>
@@ -62,14 +61,9 @@
 
         </header>
         <div class="row content">
-            <svg height="100%" width="400" id="nomo" />
+            <svg height="100%" width="400" id="svg_nomograph" />
         </div>
         <div class="row footer">
-            <!-- This will eventually be an editor...
-            <form>
-                <input id="idMin" value="5">
-            </form>
-        -->
             <div id="uiValues">
                 U=<span id="uiValueU"></span>
                 V=<span id="uiValueV"></span>
